@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="FlowPilot — Intelligent Workflow Automation Platform. Transform complex business workflows, manufacturing processes, QC checkpoints, and logistics into seamless automation.">
+<title>FlowPilot — Premium Workflow Automation Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ─── Modern SaaS Design System Tokens ─── */
+:root {
+  --bg: #080D1A;
+  --bg-secondary: #10182A;
+  --bg-tertiary: #162035;
+  --surface-glass: rgba(16, 24, 42, 0.78);
+  --surface-glass-card: rgba(22, 32, 53, 0.65);
+  --surface-card: #131c31;
+  --surface-hover: #1c2844;
+  --border: rgba(99, 102, 241, 0.18);
+  --border-cyan: rgba(34, 211, 238, 0.22);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  
+  --primary: #6366F1;
+  --primary-light: #818CF8;
+  --accent-cyan: #22D3EE;
+  --accent-cyan-light: #67E8F9;
+  --accent-violet: #A78BFA;
+  --accent-glow: rgba(99, 102, 241, 0.35);
+  --cyan-glow: rgba(34, 211, 238, 0.3);
+  
+  --text-main: #F8FAFC;
+  --text-muted: #94A3B8;
+  --text-dim: #64748B;
+  
+  --success: #22C55E;
+  --success-bg: rgba(34, 197, 94, 0.12);
+  --warning: #F59E0B;
+  --warning-bg: rgba(245, 158, 11, 0.12);
+  --error: #EF4444;
+  --error-bg: rgba(239, 68, 68, 0.12);
+  
+  --gradient-primary: linear-gradient(135deg, #6366F1, #8B5CF6, #22D3EE);
+  --gradient-glow: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(34,211,238,0.2));
+  --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px 0 rgba(99, 102, 241, 0.08);
+  --shadow-elevated: 0 20px 45px -15px rgba(0, 0, 0, 0.7), 0 0 35px 0 rgba(34, 211, 238, 0.15);
+  
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+}
+
+/* ─── Reset & Base ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body {
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+
+/* ─── Ambient Glow & Particles ─── */
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.45;
+  animation: floatOrb 18s ease-in-out infinite alternate;
+}
+.orb-1 { width: 550px; height: 550px; background: radial-gradient(circle, #6366F1 0%, transparent 70%); top: -120px; left: -100px; }
+.orb-2 { width: 650px; height: 650px; background: radial-gradient(circle, #22D3EE 0%, transparent 70%); top: 15%; right: -150px; animation-duration: 22s; }
+.orb-3 { width: 500px; height: 500px; background: radial-gradient(circle, #A78BFA 0%, transparent 70%); top: 55%; left: 10%; animation-duration: 26s; }
+
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, 60px) scale(1.08); }
+  100% { transform: translate(-30px, 30px) scale(0.95); }
+}
+
+/* ─── Scroll Reveal ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.12s; }
+.reveal-delay-2 { transition-delay: 0.24s; }
+.reveal-delay-3 { transition-delay: 0.36s; }
+
+/* ─── Typography & Badges ─── */
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.38rem 0.9rem;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-cyan);
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(10px);
+}
+.badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px var(--accent-cyan);
+  animation: pulseDot 2s infinite;
+}
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #F8FAFC 0%, #A5B4FC 50%, #22D3EE 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.section-header { text-align: center; max-width: 800px; margin: 0 auto 3.5rem; position: relative; z-index: 1; }
+.section-tag {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  margin-bottom: 0.8rem;
+}
+.section-title {
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  margin-bottom: 1rem;
+}
+.section-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* ─── Buttons ─── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.6rem;
+  border-radius: var(--radius-md);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #4F46E5, #6366F1 50%, #06B6D4);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.6), 0 0 20px rgba(34, 211, 238, 0.4);
+}
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(8px);
+}
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--border);
+  transform: translateY(-2px);
+}
+.btn-sm { padding: 0.45rem 0.9rem; font-size: 0.82rem; border-radius: var(--radius-sm); }
+.btn-outline-cyan {
+  background: transparent;
+  color: var(--accent-cyan);
+  border: 1px solid rgba(34, 211, 238, 0.35);
+}
+.btn-outline-cyan:hover {
+  background: rgba(34, 211, 238, 0.1);
+  border-color: var(--accent-cyan);
+}
+
+/* ─── Navigation ─── */
+nav.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(8, 13, 26, 0.7);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s;
+}
+nav.top-nav.scrolled {
+  background: rgba(8, 13, 26, 0.92);
+  border-bottom-color: var(--border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+}
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.brand-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px var(--accent-glow);
+}
+.brand-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(34, 211, 238, 0.15);
+  color: var(--accent-cyan);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  margin-left: 0.25rem;
+}
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  list-style: none;
+}
+.nav-link {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+.nav-link:hover { color: var(--text-main); }
+.nav-actions { display: flex; align-items: center; gap: 0.9rem; }
+.mobile-toggle {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  padding: 0.5rem;
+}
+
+/* ─── Hero Section ─── */
+header.hero-section {
+  position: relative;
+  padding: 140px 0 90px;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.hero-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 3.5rem;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+.hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+.hero-title {
+  font-size: 3.4rem;
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+.hero-desc {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  max-width: 540px;
+}
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+.hero-trust {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-top: 0.5rem;
+}
+.trust-badge-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--accent-cyan);
+}
+
+/* ─── Hero Interactive Mockup Preview ─── */
+.hero-mockup-wrapper {
+  position: relative;
+}
+.mockup-glow {
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(circle at 60% 40%, rgba(99, 102, 241, 0.25), rgba(34, 211, 238, 0.15) 60%, transparent 80%);
+  filter: blur(40px);
+  z-index: 0;
+}
+.hero-mockup-card {
+  position: relative;
+  z-index: 1;
+  background: var(--surface-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-elevated);
+  backdrop-filter: blur(25px);
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hero-mockup-card:hover { transform: translateY(-4px); }
+.mockup-header {
+  padding: 0.9rem 1.2rem;
+  background: rgba(16, 24, 42, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.mockup-dots { display: flex; gap: 6px; }
+.mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot-red { background: #EF4444; }
+.dot-yellow { background: #F59E0B; }
+.dot-green { background: #22C55E; }
+.mockup-title-bar {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.mockup-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+.mockup-stats-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+}
+.m-stat-pill {
+  background: var(--surface-card);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.4rem;
+  text-align: center;
+}
+.m-stat-num { font-size: 1.15rem; font-weight: 800; color: var(--text-main); }
+.m-stat-lbl { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; font-weight: 600; margin-top: 2px; }
+
+/* Workflow tracker banner inside hero mockup */
+.mockup-workflow-track {
+  background: rgba(99, 102, 241, 0.07);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.9rem;
+}
+.wf-track-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+  font-size: 0.8rem;
+}
+.wf-order-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+.wf-steps-chain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  margin-top: 0.4rem;
+}
+.wf-step-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  z-index: 2;
+}
+.node-circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--surface-card);
+  border: 2px solid var(--border-subtle);
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  transition: all 0.3s;
+}
+.node-circle.done {
+  background: #10B981;
+  border-color: #10B981;
+  color: #fff;
+}
+.node-circle.active {
+  background: var(--primary);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 10px var(--accent-cyan);
+  color: #fff;
+  animation: pulseNode 1.8s infinite;
+}
+@keyframes pulseNode {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); box-shadow: 0 0 14px var(--accent-cyan); }
+}
+.node-lbl { font-size: 0.62rem; color: var(--text-dim); text-align: center; white-space: nowrap; }
+.wf-connector-line {
+  position: absolute;
+  top: 10px;
+  left: 5%;
+  right: 5%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 1;
+}
+.wf-connector-fill {
+  height: 100%;
+  width: 68%;
+  background: linear-gradient(90deg, #10B981, #6366F1, #22D3EE);
+  border-radius: 2px;
+}
+
+/* Active Order Card */
+.mockup-active-order {
+  background: var(--surface-card);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.order-left-meta { display: flex; align-items: center; gap: 0.8rem; }
+.order-mirror-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(99, 102, 241, 0.2));
+  border: 1px solid var(--border-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-cyan);
+}
+.order-name { font-size: 0.88rem; font-weight: 700; color: var(--text-main); }
+.order-specs { font-size: 0.74rem; color: var(--text-muted); }
+.order-status-badge {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--warning);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+}
+
+/* ─── Social Proof / Metrics Ribbon ─── */
+.metrics-ribbon {
+  background: rgba(16, 24, 42, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 1.8rem 0;
+}
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  text-align: center;
+}
+.metric-box h3 {
+  font-size: 2.1rem;
+  font-weight: 900;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+.metric-box p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ─── Section 2: Mirrorverse Showcase ─── */
+section.mirrorverse-showcase {
+  padding: 110px 0;
+  position: relative;
+  background: radial-gradient(circle at 50% 20%, rgba(34, 211, 238, 0.06), transparent 70%);
+}
+.mirror-story-card {
+  background: var(--surface-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 2.5rem;
+  backdrop-filter: blur(20px);
+  margin-bottom: 3.5rem;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  box-shadow: var(--shadow-card);
+}
+.story-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.8rem;
+}
+.story-title {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-bottom: 1rem;
+}
+.story-desc {
+  font-size: 1rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+.story-highlights {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.story-highlight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.86rem;
+  color: var(--text-main);
+}
+.story-highlight-item svg {
+  color: var(--accent-cyan);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Mirror Mockup Visual */
+.story-mirror-visual {
+  position: relative;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(16, 24, 42, 0.9), rgba(26, 38, 66, 0.7));
+  border: 1px solid var(--border-cyan);
+  padding: 2rem;
+  box-shadow: 0 0 40px rgba(34, 211, 238, 0.15);
+}
+.mirror-frame-preview {
+  position: relative;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01));
+  border: 4px solid #D4AF37;
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.3), inset 0 0 30px rgba(34, 211, 238, 0.2);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  overflow: hidden;
+}
+.mirror-spec-tag {
+  display: inline-block;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--border);
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent-cyan);
+  margin-top: 1rem;
+}
+
+/* Mirrorverse 6 Specializations Grid */
+.mirror-types-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+.mirror-type-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.8rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+.mirror-type-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--border-cyan);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(34, 211, 238, 0.12);
+}
+.m-type-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-cyan);
+  margin-bottom: 1.2rem;
+}
+.m-type-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; }
+.m-type-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
+
+/* ─── Section 3: Tailored Features ─── */
+section.tailored-features {
+  padding: 110px 0;
+  position: relative;
+  background: var(--bg-secondary);
+}
+.feature-card-large {
+  background: var(--surface-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 3rem;
+  margin-bottom: 4rem;
+  backdrop-filter: blur(20px);
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 3.5rem;
+  align-items: center;
+  box-shadow: var(--shadow-card);
+}
+.feature-card-large.reverse { grid-template-columns: 1.15fr 1fr; }
+.feat-badge-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  background: rgba(34, 211, 238, 0.1);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  display: inline-block;
+  margin-bottom: 0.9rem;
+}
+.feat-heading { font-size: 2.1rem; font-weight: 800; line-height: 1.22; margin-bottom: 1rem; }
+.feat-paragraph { font-size: 1.02rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.5rem; }
+.feat-bullet-list { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+.feat-bullet-item { display: flex; align-items: center; gap: 0.65rem; font-size: 0.9rem; color: var(--text-main); }
+.feat-bullet-item svg { color: var(--accent-cyan); flex-shrink: 0; }
+
+.interactive-ui-box {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.8rem;
+  box-shadow: var(--shadow-elevated);
+}
+.ui-box-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 1rem;
+  margin-bottom: 1.2rem;
+}
+.ui-tag-id { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 700; color: var(--accent-cyan); }
+
+/* Feature 1 UI */
+.task-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; margin-bottom: 1.2rem; }
+.form-field-unit label { display: block; font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+.form-field-unit .val-text { font-size: 0.88rem; font-weight: 600; color: var(--text-main); background: rgba(255, 255, 255, 0.03); padding: 0.45rem 0.7rem; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.05); }
+.upload-dropzone { border: 2px dashed rgba(99, 102, 241, 0.35); border-radius: var(--radius-md); padding: 1.2rem; text-align: center; background: rgba(99, 102, 241, 0.04); cursor: pointer; margin-bottom: 1rem; }
+.upload-dropzone:hover { border-color: var(--accent-cyan); background: rgba(34, 211, 238, 0.06); }
+.upload-dropzone svg { color: var(--accent-cyan); margin-bottom: 0.4rem; }
+.upload-dropzone h4 { font-size: 0.85rem; font-weight: 600; }
+.upload-dropzone p { font-size: 0.72rem; color: var(--text-dim); }
+
+/* Feature 2 UI: Conditional Simulator */
+.spec-toggles-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.2rem; }
+.spec-toggle-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-sm); padding: 0.75rem 0.9rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.25s; }
+.spec-toggle-card.active { background: rgba(99, 102, 241, 0.15); border-color: var(--primary); }
+.spec-lbl-name { font-size: 0.82rem; font-weight: 600; }
+.spec-switch { width: 36px; height: 20px; border-radius: 12px; background: #334155; position: relative; transition: background 0.3s; }
+.spec-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform 0.3s; }
+.spec-toggle-card.active .spec-switch { background: var(--accent-cyan); }
+.spec-toggle-card.active .spec-switch::after { transform: translateX(16px); }
+
+.branch-canvas-box { background: #0B1120; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.1rem; }
+.branch-nodes-list { display: flex; flex-direction: column; gap: 0.6rem; }
+.branch-node-pill { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0.9rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; border-left: 3px solid #6366F1; background: rgba(255, 255, 255, 0.03); }
+
+/* Feature 3 UI: QC Stop Task */
+.qc-lock-banner { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-md); padding: 0.9rem 1.1rem; display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.qc-lock-banner.unlocked { background: rgba(34, 197, 94, 0.12); border-color: rgba(34, 197, 94, 0.3); }
+.qc-check-item { display: flex; align-items: center; gap: 0.75rem; background: rgba(255, 255, 255, 0.03); padding: 0.6rem 0.8rem; border-radius: 6px; font-size: 0.82rem; cursor: pointer; margin-bottom: 0.5rem; }
+.qc-box-custom { width: 18px; height: 18px; border-radius: 4px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; }
+.qc-check-item.checked .qc-box-custom { background: var(--success); border-color: var(--success); color: #fff; }
+.qc-check-item.checked { color: var(--text-muted); text-decoration: line-through; }
+
+/* ─── Section 4: Interactive Dashboard Preview ─── */
+section.interactive-dashboard-section {
+  padding: 120px 0;
+  position: relative;
+  background: #080D1A;
+}
+.dashboard-frame-outer {
+  background: var(--surface-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-elevated), 0 0 50px rgba(99, 102, 241, 0.12);
+  backdrop-filter: blur(25px);
+  overflow: hidden;
+}
+.dash-topbar {
+  background: #0D1424;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.dash-main-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 600px; }
+.dash-sidebar { background: #0B1120; border-right: 1px solid rgba(255, 255, 255, 0.06); padding: 1.5rem 1rem; }
+.dash-tab-btn { width: 100%; display: flex; align-items: center; gap: 0.8rem; padding: 0.75rem 1rem; border-radius: var(--radius-md); border: 1px solid transparent; background: transparent; color: var(--text-muted); font-size: 0.88rem; font-weight: 600; text-align: left; transition: all 0.2s; }
+.dash-tab-btn.active { background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(34, 211, 238, 0.12)); border-color: var(--border-cyan); color: var(--text-main); }
+.dash-viewport { background: #0E1629; padding: 2.2rem; }
+.dash-pane { display: none; }
+.dash-pane.active { display: block; }
+
+/* ─── Steps Section ─── */
+section.how-it-works-section { padding: 110px 0; background: var(--bg-secondary); }
+.steps-triad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+.step-column-card { background: var(--surface-glass); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 2.5rem 2rem; position: relative; transition: all 0.3s; }
+.step-column-card:hover { transform: translateY(-6px); border-color: var(--border-cyan); }
+.step-icon-wrap { width: 56px; height: 56px; border-radius: 16px; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; color: #fff; margin-bottom: 1.8rem; box-shadow: 0 0 25px var(--accent-glow); }
+.step-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.8rem; }
+.step-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.65; }
+
+/* ─── Benefits Section ─── */
+section.benefits-section { padding: 110px 0; background: #080D1A; }
+.benefits-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.8rem; }
+.benefit-card { background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 2rem; transition: all 0.3s; }
+.benefit-card:hover { border-color: var(--border); transform: translateY(-4px); }
+.benefit-icon { width: 44px; height: 44px; border-radius: 10px; background: rgba(34, 211, 238, 0.1); color: var(--accent-cyan); display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem; }
+.benefit-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.6rem; }
+.benefit-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+
+/* ─── Final CTA ─── */
+section.final-cta-section { padding: 130px 0; background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.18), transparent 70%), #0A1022; border-top: 1px solid rgba(255, 255, 255, 0.06); text-align: center; }
+.cta-title { font-size: 3.2rem; font-weight: 900; line-height: 1.15; letter-spacing: -0.03em; margin-bottom: 1.2rem; }
+.cta-desc { font-size: 1.18rem; color: var(--text-muted); max-width: 680px; margin: 0 auto 2.2rem; }
+
+/* ─── Footer ─── */
+footer.site-footer { background: #060913; border-top: 1px solid rgba(255, 255, 255, 0.05); padding: 70px 0 35px; font-size: 0.88rem; color: var(--text-muted); }
+.footer-top-grid { display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3.5rem; }
+.footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; }
+.footer-links a:hover { color: var(--text-main); }
+.footer-bottom-bar { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 2rem; font-size: 0.8rem; color: var(--text-dim); }
+
+/* ─── Toast System ─── */
+#toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast { background: var(--surface-glass); border: 1px solid var(--border-cyan); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); backdrop-filter: blur(16px); color: var(--text-main); padding: 0.85rem 1.25rem; border-radius: var(--radius-md); font-size: 0.85rem; display: flex; align-items: center; gap: 0.75rem; }
+
+@media (max-width: 1024px) {
+  .hero-grid { grid-template-columns: 1fr; }
+  .mirror-story-card { grid-template-columns: 1fr; }
+  .feature-card-large, .feature-card-large.reverse { grid-template-columns: 1fr; }
+  .dash-main-layout { grid-template-columns: 1fr; }
+  .mirror-types-grid { grid-template-columns: 1fr 1fr; }
+  .footer-top-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .hero-title { font-size: 2.5rem; }
+  .section-title { font-size: 2rem; }
+  .metrics-grid { grid-template-columns: 1fr 1fr; }
+  .mirror-types-grid { grid-template-columns: 1fr; }
+  .steps-triad-grid { grid-template-columns: 1fr; }
+  .benefits-grid { grid-template-columns: 1fr; }
+  .nav-menu { display: none; }
+  .mobile-toggle { display: block; }
+}
+</style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+<div class="ambient-orb orb-1"></div>
+<div class="ambient-orb orb-2"></div>
+<div class="ambient-orb orb-3"></div>
+
+<!-- ─── Top Navigation ─── -->
+<nav class="top-nav" id="mainNav">
+  <div class="wrap nav-inner">
+    <a href="index.html" class="brand-logo">
+      <div class="brand-icon-box">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+      </div>
+      Flow<span>Pilot</span>
+      <span class="brand-badge">Automation Platform</span>
+    </a>
+
+    <ul class="nav-menu" id="navMenu">
+      <li><a href="#mirrorverse" class="nav-link">Mirrorverse Case</a></li>
+      <li><a href="#features" class="nav-link">Key Features</a></li>
+      <li><a href="#dashboard-preview" class="nav-link">Interactive Demo</a></li>
+      <li><a href="#how" class="nav-link">How It Works</a></li>
+      <li><a href="#benefits" class="nav-link">Benefits</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <a href="login.html?view=login" class="btn btn-secondary btn-sm">Sign In</a>
+      <a href="app.html" class="btn btn-primary btn-sm">
+        <span>Open Workspace</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <button class="mobile-toggle" onclick="document.getElementById('navMenu').classList.toggle('open')" aria-label="Toggle menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── 1. Premium Hero Section ─── -->
+<header class="hero-section">
+  <canvas id="particles-canvas" class="hero-canvas"></canvas>
+  <div class="wrap hero-grid">
+    <div class="hero-content">
+      <div class="badge-pill reveal">
+        <span class="badge-dot"></span>
+        Enterprise Workflow Automation &middot; Mirrorverse Edition
+      </div>
+      <h1 class="hero-title reveal reveal-delay-1">
+        Turn Complex Business Workflows Into <span class="gradient-text">Seamless Automation.</span>
+      </h1>
+      <p class="hero-desc reveal reveal-delay-2">
+        From custom manufacturing to quality control and delivery, FlowPilot connects your people, processes, and operations in one intelligent workspace.
+      </p>
+      <div class="hero-actions reveal reveal-delay-3">
+        <a href="login.html?view=signup" class="btn btn-primary">
+          <span>Start Free &bull; Sign Up</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#dashboard-preview" class="btn btn-secondary">Interactive Demo</a>
+      </div>
+      <div class="hero-trust reveal reveal-delay-3">
+        <svg class="trust-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Built for teams that value precision, speed, and operational excellence.</span>
+      </div>
+    </div>
+
+    <!-- Right Side Hero Dashboard Preview -->
+    <div class="hero-mockup-wrapper reveal reveal-delay-2">
+      <div class="mockup-glow"></div>
+      <div class="hero-mockup-card">
+        <div class="mockup-header">
+          <div class="mockup-dots">
+            <span class="mockup-dot dot-red"></span>
+            <span class="mockup-dot dot-yellow"></span>
+            <span class="mockup-dot dot-green"></span>
+          </div>
+          <div class="mockup-title-bar">
+            <span>flowpilot://mirrorverse-ops/live-flow</span>
+            <a href="app.html" class="live-indicator"><span class="badge-dot"></span> OPEN APP &rarr;</a>
+          </div>
+          <span style="font-size: 0.72rem; color: var(--text-dim);">v2.4.1</span>
+        </div>
+
+        <div class="mockup-body">
+          <div class="mockup-stats-row">
+            <div class="m-stat-pill">
+              <div class="m-stat-num" style="color: var(--accent-cyan);">24</div>
+              <div class="m-stat-lbl">Active Orders</div>
+            </div>
+            <div class="m-stat-pill">
+              <div class="m-stat-num" style="color: #818CF8;">6</div>
+              <div class="m-stat-lbl">Design Phase</div>
+            </div>
+            <div class="m-stat-pill">
+              <div class="m-stat-num" style="color: #F59E0B;">11</div>
+              <div class="m-stat-lbl">Production</div>
+            </div>
+            <div class="m-stat-pill">
+              <div class="m-stat-num" style="color: #EC4899;">4</div>
+              <div class="m-stat-lbl">Pending QC</div>
+            </div>
+            <div class="m-stat-pill">
+              <div class="m-stat-num" style="color: #10B981;">3</div>
+              <div class="m-stat-lbl">Ready Dispatch</div>
+            </div>
+          </div>
+
+          <div class="mockup-workflow-track">
+            <div class="wf-track-header">
+              <div>
+                <span style="color: var(--text-dim); font-size: 0.72rem;">PIPELINE:</span>
+                <span class="wf-order-code">MV-2026-1042</span>
+              </div>
+              <span style="font-size: 0.72rem; color: var(--accent-cyan); font-weight: 600;">Stage 4 of 6 (68% Complete)</span>
+            </div>
+            <div class="wf-steps-chain">
+              <div class="wf-connector-line"><div class="wf-connector-fill"></div></div>
+              <div class="wf-step-node"><div class="node-circle done">&#10003;</div><div class="node-lbl">New Order</div></div>
+              <div class="wf-step-node"><div class="node-circle done">&#10003;</div><div class="node-lbl">Design Appr.</div></div>
+              <div class="wf-step-node"><div class="node-circle done">&#10003;</div><div class="node-lbl">Manufacturing</div></div>
+              <div class="wf-step-node"><div class="node-circle active">&#9881;</div><div class="node-lbl" style="color: var(--accent-cyan); font-weight: 700;">QC Check</div></div>
+              <div class="wf-step-node"><div class="node-circle">5</div><div class="node-lbl">Packaging</div></div>
+              <div class="wf-step-node"><div class="node-circle">6</div><div class="node-lbl">Delivery</div></div>
+            </div>
+          </div>
+
+          <div class="mockup-active-order">
+            <div class="order-left-meta">
+              <div class="order-mirror-thumb">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+              </div>
+              <div>
+                <div class="order-name">48&times;72" Luxury LED Backlit Mirror</div>
+                <div class="order-specs">Client: Penthouse Suite D &bull; Brushed Gold Frame &bull; Anti-Fog</div>
+              </div>
+            </div>
+            <span class="order-status-badge">Awaiting Lead QC</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ─── Social Proof & Business Metrics ─── -->
+<div class="metrics-ribbon">
+  <div class="wrap metrics-grid">
+    <div class="metric-box reveal">
+      <h3 class="gradient-text">99.8%</h3>
+      <p>QC Pass Rate Across 1,400+ Units</p>
+    </div>
+    <div class="metric-box reveal reveal-delay-1">
+      <h3 class="gradient-text">4.2 Days</h3>
+      <p>Average Custom Manufacturing Cycle</p>
+    </div>
+    <div class="metric-box reveal reveal-delay-2">
+      <h3 class="gradient-text">0</h3>
+      <p>Manual Spreadsheets or Lost Specs</p>
+    </div>
+    <div class="metric-box reveal reveal-delay-3">
+      <h3 class="gradient-text">100%</h3>
+      <p>End-to-End Audit &amp; Logistics Traceability</p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 2. Mirrorverse Business Showcase ─── -->
+<section id="mirrorverse" class="mirrorverse-showcase">
+  <div class="wrap">
+    <div class="section-header reveal">
+      <div class="section-tag">Case In Point: Luxury Manufacturing</div>
+      <h2 class="section-title">One Platform. Every Step of Your Business.</h2>
+      <p class="section-subtitle">
+        See how FlowPilot transforms the complete custom mirror manufacturing journey into a connected, automated workflow for <strong>Mirrorverse</strong>.
+      </p>
+    </div>
+
+    <div class="mirror-story-card reveal">
+      <div>
+        <div class="story-tag">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Mirrorverse &times; FlowPilot Operations
+        </div>
+        <h3 class="story-title">Crafting Precision Glass with Flawless Digital Orchestration</h3>
+        <p class="story-desc">
+          Mirrorverse is a premier atelier crafting bespoke architectural mirrors, intelligent LED backlit installations, and commercial hospitality features. With FlowPilot, every single glass cut, electrical wire routing, and transit packaging task is governed by automated rules and strict quality gates.
+        </p>
+        <div class="story-highlights">
+          <div class="story-highlight-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Sub-millimeter dimension tracking</span></div>
+          <div class="story-highlight-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Mandatory CAD drawing attachments</span></div>
+          <div class="story-highlight-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Integrated electrical safety certification</span></div>
+          <div class="story-highlight-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Automated freight partner dispatch</span></div>
+        </div>
+      </div>
+
+      <div class="story-mirror-visual">
+        <div class="mirror-frame-preview">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.5" style="margin-bottom: 0.8rem;">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          <div style="font-weight: 800; font-size: 1.1rem; color: #FFF;">MIRRORVERSE BESPOKE</div>
+          <div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 4px;">6mm Ultra-Clear Float Glass &bull; 90+ CRI LED</div>
+          <div class="mirror-spec-tag">SPEC: 48 &times; 72" &bull; BRUSHED GOLD</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 Specialization Cards -->
+    <div class="mirror-types-grid">
+      <div class="mirror-type-card reveal">
+        <div class="m-type-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+        <h4 class="m-type-title">Custom Decorative Mirrors</h4>
+        <p class="m-type-desc">Artistic geometric cuts, antique silvering finishes, and custom facet edge polish managed through exact visual specs.</p>
+      </div>
+      <div class="mirror-type-card reveal reveal-delay-1">
+        <div class="m-type-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>
+        <h4 class="m-type-title">Premium Framed Mirrors</h4>
+        <p class="m-type-desc">Brushed brass, matte black anodized aluminum, and solid hardwood joinery with automated miter inspection tasks.</p>
+      </div>
+      <div class="mirror-type-card reveal reveal-delay-2">
+        <div class="m-type-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <h4 class="m-type-title">LED Backlit Mirrors</h4>
+        <p class="m-type-desc">3000K–6000K dual-temp smart LED channels, touch sensor integration, and mandatory 12V driver burn-in tests.</p>
+      </div>
+      <div class="mirror-type-card reveal">
+        <div class="m-type-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div>
+        <h4 class="m-type-title">Commercial &amp; Hospitality</h4>
+        <p class="m-type-desc">Bulk multi-unit fabrication for boutique hotels, fitness chains, and luxury architectural showrooms with phased delivery.</p>
+      </div>
+      <div class="mirror-type-card reveal reveal-delay-1">
+        <div class="m-type-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+        <h4 class="m-type-title">Bespoke Dimensions</h4>
+        <p class="m-type-desc">Dynamic engineering routines that automatically calculate structural reinforcement brackets for oversize panels.</p>
+      </div>
+      <div class="mirror-type-card reveal reveal-delay-2">
+        <div class="m-type-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+        <h4 class="m-type-title">Luxury Installations</h4>
+        <p class="m-type-desc">White-glove site delivery coordination with specialized transit crates, acoustic dampening pads, and installer sign-offs.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 3. Key Features Tailored to Business ─── -->
+<section id="features" class="tailored-features">
+  <div class="wrap">
+    <div class="section-header reveal">
+      <div class="section-tag">Engineered For Execution</div>
+      <h2 class="section-title">Key Features Tailored to Your Business</h2>
+      <p class="section-subtitle">
+        Four foundational capabilities that eliminate production friction, protect product quality, and streamline cross-team fulfillment.
+      </p>
+    </div>
+
+    <!-- Feature 1: Visual Material & Document Fields -->
+    <div class="feature-card-large reveal">
+      <div>
+        <span class="feat-badge-num">FEATURE 01</span>
+        <h3 class="feat-heading">Every Specification. Every Detail. Captured.</h3>
+        <p class="feat-paragraph">
+          Custom manufacturing depends on exact technical specifications. FlowPilot allows mandatory file upload fields directly inside workflow tasks, guaranteeing that production never commences blindly without validated blueprints.
+        </p>
+        <ul class="feat-bullet-list">
+          <li class="feat-bullet-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>Mandatory CAD drawings (.dwg, .dxf) attachment gates</span></li>
+          <li class="feat-bullet-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>High-resolution reference images with zoom previews</span></li>
+          <li class="feat-bullet-item"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>Exact dimension sheets with mm tolerance validations</span></li>
+        </ul>
+      </div>
+
+      <div class="interactive-ui-box">
+        <div class="ui-box-titlebar">
+          <div>
+            <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">WORKFLOW TASK SPECIFICATION</span>
+            <div class="ui-tag-id">Order ID: MV-2026-1042</div>
+          </div>
+          <span class="live-indicator"><span class="badge-dot"></span> Active Task</span>
+        </div>
+
+        <div class="task-form-grid">
+          <div class="form-field-unit"><label>Mirror Type</label><div class="val-text">Premium LED Mirror</div></div>
+          <div class="form-field-unit"><label>Dimensions</label><div class="val-text">48 &times; 72 inches</div></div>
+          <div class="form-field-unit"><label>Frame Finish</label><div class="val-text">Brushed Gold</div></div>
+          <div class="form-field-unit"><label>Design Approval</label><div class="val-text" style="color: var(--warning);">Pending Sign-Off</div></div>
+        </div>
+
+        <div class="upload-dropzone" onclick="showToast('Upload simulation: CAD file MV-1042-rev4.dwg verified.')">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <h4>Drop CAD Blueprint or Specification Sheets</h4>
+          <p>Supports .DWG, .DXF, .PDF, .PNG &bull; Max 50MB</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 2: Conditional Logic -->
+    <div class="feature-card-large reverse reveal">
+      <div class="interactive-ui-box">
+        <div class="ui-box-titlebar">
+          <div>
+            <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">CONDITIONAL WORKFLOW ENGINE</span>
+            <div class="ui-tag-id">Dynamic Branch Evaluation</div>
+          </div>
+          <span style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 600;">Click options to test</span>
+        </div>
+
+        <div class="spec-toggles-row">
+          <div class="spec-toggle-card active" id="toggleFraming" onclick="toggleCondition('framing')">
+            <span class="spec-lbl-name">Premium Framing</span><div class="spec-switch"></div>
+          </div>
+          <div class="spec-toggle-card active" id="toggleLed" onclick="toggleCondition('led')">
+            <span class="spec-lbl-name">LED Backlighting</span><div class="spec-switch"></div>
+          </div>
+          <div class="spec-toggle-card" id="toggleSize" onclick="toggleCondition('size')">
+            <span class="spec-lbl-name">XL Size</span><div class="spec-switch"></div>
+          </div>
+          <div class="spec-toggle-card active" id="toggleAntiFog" onclick="toggleCondition('antiFog')">
+            <span class="spec-lbl-name">Anti-Fog Layer</span><div class="spec-switch"></div>
+          </div>
+        </div>
+
+        <div class="branch-canvas-box">
+          <div class="branch-nodes-list" id="dynamicBranchList">
+            <div class="branch-node-pill"><span>1. Precision Glass Cutting &amp; CNC Beveling</span><span style="color:var(--text-dim); font-size:0.72rem;">CORE</span></div>
+            <div class="branch-node-pill" id="nodeFraming"><span>2. Premium Frame Miter Preparation</span><span style="color:var(--accent-cyan); font-size:0.72rem;">CONDITIONAL</span></div>
+            <div class="branch-node-pill" id="nodeLed"><span>3. Procure LED Kits &amp; Test Voltage</span><span style="color:var(--accent-cyan); font-size:0.72rem;">CONDITIONAL</span></div>
+            <div class="branch-node-pill" id="nodeAntiFog"><span>4. Apply Heated Anti-Fog Membrane</span><span style="color:var(--accent-cyan); font-size:0.72rem;">CONDITIONAL</span></div>
+            <div class="branch-node-pill" id="nodeXl" style="display:none;"><span>5. Structural Reinforcement Brackets</span><span style="color:var(--accent-cyan); font-size:0.72rem;">CONDITIONAL</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <span class="feat-badge-num">FEATURE 02</span>
+        <h3 class="feat-heading">Workflows That Adapt to Every Custom Order.</h3>
+        <p class="feat-paragraph">
+          FlowPilot dynamically adjusts workflows according to the customer's selected specifications, automatically inserting or removing the required manufacturing and testing steps.
+        </p>
+      </div>
+    </div>
+
+    <!-- Feature 3: QC Stop Task -->
+    <div class="feature-card-large reveal">
+      <div>
+        <span class="feat-badge-num">FEATURE 03</span>
+        <h3 class="feat-heading">Quality Control That Cannot Be Skipped.</h3>
+        <p class="feat-paragraph">
+          Protect your brand reputation with mandatory quality checkpoints. FlowPilot's <strong>Stop Tasks</strong> prevent the production line from advancing until lead inspectors complete multi-point verification.
+        </p>
+      </div>
+
+      <div class="interactive-ui-box">
+        <div class="qc-lock-banner" id="qcLockBanner">
+          <div style="display:flex; align-items:center; gap:0.7rem;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="qcLockIcon"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <div>
+              <div style="font-weight:700;" id="qcLockTitle">Final QC Approval Required</div>
+              <div style="font-size:0.74rem; color:var(--text-muted);" id="qcLockSub">Awaiting sign-off before packaging</div>
+            </div>
+          </div>
+        </div>
+
+        <ul style="list-style:none; margin-bottom:1rem;">
+          <li class="qc-check-item checked" onclick="toggleQcItem(this)"><div class="qc-box-custom">&#10003;</div><span>Optical surface inspection completed</span></li>
+          <li class="qc-check-item checked" onclick="toggleQcItem(this)"><div class="qc-box-custom">&#10003;</div><span>Dimensions verified (&plusmn;0.5mm tolerance)</span></li>
+          <li class="qc-check-item" onclick="toggleQcItem(this)" id="finalQcItem"><div class="qc-box-custom"></div><span>Packaging corner guards &amp; crating verified</span></li>
+        </ul>
+
+        <div style="display:flex; gap:0.6rem;">
+          <button class="btn btn-primary btn-sm" id="btnApproveQc" onclick="approveQcGate()">Sign Off QC</button>
+          <button class="btn btn-secondary btn-sm" id="btnTransitLabel" disabled style="opacity:0.45; cursor:not-allowed;" onclick="showToast('Transit Label Generated: #FL-2026-MV1042-EXP')">Generate Transit Label</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 4. Interactive Mirrorverse Dashboard ─── -->
+<section id="dashboard-preview" class="interactive-dashboard-section">
+  <div class="wrap">
+    <div class="section-header reveal">
+      <div class="section-tag">Interactive Product Demonstration</div>
+      <h2 class="section-title">Your Entire Operation. One Intelligent Dashboard.</h2>
+      <p class="section-subtitle">
+        Explore how FlowPilot manages daily Mirrorverse production, documentation, and reporting.
+      </p>
+    </div>
+
+    <div class="dashboard-frame-outer reveal">
+      <div class="dash-topbar">
+        <div style="display:flex; align-items:center; gap:0.6rem; font-size:0.88rem; font-weight:600;">
+          <span style="color: var(--accent-cyan); font-weight: 700;">FlowPilot Workspace</span>
+          <span>/</span>
+          <span>Mirrorverse Custom Manufacturing</span>
+        </div>
+        <div>
+          <a href="app.html" class="btn btn-primary btn-sm">Launch Live Workspace &rarr;</a>
+        </div>
+      </div>
+
+      <div class="dash-main-layout">
+        <aside class="dash-sidebar">
+          <ul style="list-style:none; display:flex; flex-direction:column; gap:0.4rem;">
+            <li><button class="dash-tab-btn active" onclick="switchDashboardTab('tab-work', this)"><span>My Work</span></button></li>
+            <li><button class="dash-tab-btn" onclick="switchDashboardTab('tab-library', this)"><span>Library</span></button></li>
+            <li><button class="dash-tab-btn" onclick="switchDashboardTab('tab-reports', this)"><span>Reports</span></button></li>
+            <li><button class="dash-tab-btn" onclick="switchDashboardTab('tab-datasets', this)"><span>Data Sets</span></button></li>
+          </ul>
+        </aside>
+
+        <main class="dash-viewport">
+          <div class="dash-pane active" id="tab-work">
+            <h3 style="font-size:1.3rem; font-weight:800; margin-bottom:1rem;">My Work &bull; High Priority Queue</h3>
+            <div style="background:var(--surface-card); padding:1rem; border-radius:8px; border:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
+              <div>
+                <strong style="color:var(--text-main);">Approve Revised Mirror Dimensions (Order MV-2026-1042)</strong>
+                <div style="font-size:0.75rem; color:var(--text-muted);">48x72 inch brushed gold mirror &bull; Client: Penthouse Suite D</div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="this.textContent='Approved'; this.disabled=true; showToast('Task Approved.');">Approve</button>
+            </div>
+            <div style="background:var(--surface-card); padding:1rem; border-radius:8px; border:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong style="color:var(--text-main);">Sign Off on Final QC Inspection (Order MV-2026-1038)</strong>
+                <div style="font-size:0.75rem; color:var(--text-muted);">Surface inspection &amp; LED burn-in test</div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="this.textContent='Signed Off'; this.disabled=true; showToast('QC Signed Off.');">Sign Off</button>
+            </div>
+          </div>
+
+          <div class="dash-pane" id="tab-library">
+            <h3 style="font-size:1.3rem; font-weight:800; margin-bottom:1rem;">Standard Workflow Templates</h3>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+              <div style="background:var(--surface-card); padding:1rem; border-radius:8px; border:1px solid var(--border-subtle);">
+                <strong>Custom Mirror Manufacturing</strong>
+                <p style="font-size:0.78rem; color:var(--text-muted);">7-step CAD to crating sequence.</p>
+              </div>
+              <div style="background:var(--surface-card); padding:1rem; border-radius:8px; border:1px solid var(--border-subtle);">
+                <strong>Premium LED Mirror Production</strong>
+                <p style="font-size:0.78rem; color:var(--text-muted);">9-step electrical &amp; testing sequence.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-pane" id="tab-reports">
+            <h3 style="font-size:1.3rem; font-weight:800; margin-bottom:1rem;">Operational KPI Summary</h3>
+            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:0.8rem;">
+              <div style="background:var(--surface-card); padding:1rem; border-radius:8px; text-align:center;">
+                <div style="font-size:1.6rem; font-weight:800; color:var(--accent-cyan);">24</div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">Active Orders</div>
+              </div>
+              <div style="background:var(--surface-card); padding:1rem; border-radius:8px; text-align:center;">
+                <div style="font-size:1.6rem; font-weight:800; color:#10B981;">98.4%</div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">QC Pass Rate</div>
+              </div>
+              <div style="background:var(--surface-card); padding:1rem; border-radius:8px; text-align:center;">
+                <div style="font-size:1.6rem; font-weight:800; color:#F59E0B;">4.8d</div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">Avg Lead Time</div>
+              </div>
+              <div style="background:var(--surface-card); padding:1rem; border-radius:8px; text-align:center;">
+                <div style="font-size:1.6rem; font-weight:800; color:#818CF8;">100%</div>
+                <div style="font-size:0.72rem; color:var(--text-muted);">On-Time Freight</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-pane" id="tab-datasets">
+            <h3 style="font-size:1.3rem; font-weight:800; margin-bottom:1rem;">Commercial Data Sets</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Reusable records connect directly to workflow forms without re-entry.</p>
+            <div style="background:var(--surface-card); padding:1rem; border-radius:8px; font-family:'JetBrains Mono', monospace; font-size:0.78rem;">
+              Retail Clients: 142 records &bull; Commercial Spaces: 28 sites &bull; Raw Materials: 86 SKUs
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 5. How FlowPilot Works ─── -->
+<section id="how" class="how-it-works-section">
+  <div class="wrap">
+    <div class="section-header reveal">
+      <div class="section-tag">Frictionless Operational Execution</div>
+      <h2 class="section-title">How FlowPilot Works</h2>
+      <p class="section-subtitle">
+        A seamless 3-stage loop that transforms complex, bespoke manufacturing into reliable, repeatable business velocity.
+      </p>
+    </div>
+
+    <div class="steps-triad-grid">
+      <div class="step-column-card reveal">
+        <div class="step-icon-wrap"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+        <h3 class="step-title">1. Design Your Workflow</h3>
+        <p class="step-desc">Build customized processes using reusable templates, task forms, and conditional logic. Specify mandatory files, dimensions, and approval criteria.</p>
+      </div>
+      <div class="step-column-card reveal reveal-delay-1">
+        <div class="step-icon-wrap"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3 class="step-title">2. Automate Collaboration</h3>
+        <p class="step-desc">Assign responsibilities, collect mandatory blueprints, trigger client approvals, and notify internal teams and external logistics partners automatically.</p>
+      </div>
+      <div class="step-column-card reveal reveal-delay-2">
+        <div class="step-icon-wrap"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+        <h3 class="step-title">3. Track Every Outcome</h3>
+        <p class="step-desc">Monitor manufacturing throughput, enforce un-skippable QC stop tasks, hit delivery deadlines, and review operational analytics from one dashboard.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 6. Business Benefits ─── -->
+<section id="benefits" class="benefits-section">
+  <div class="wrap">
+    <div class="section-header reveal">
+      <div class="section-tag">Operational Excellence</div>
+      <h2 class="section-title">Built for Precision. Designed for Growth.</h2>
+    </div>
+
+    <div class="benefits-grid">
+      <div class="benefit-card reveal"><div class="benefit-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><h4 class="benefit-title">Fewer Manual Follow-Ups</h4><p class="benefit-desc">Automated task handoffs eliminate constant status checks across email and Slack.</p></div>
+      <div class="benefit-card reveal reveal-delay-1"><div class="benefit-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div><h4 class="benefit-title">Consistent Quality</h4><p class="benefit-desc">Every mirror follows the exact same standardized workflow steps adhering to factory specs.</p></div>
+      <div class="benefit-card reveal reveal-delay-2"><div class="benefit-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><h4 class="benefit-title">Faster Approvals</h4><p class="benefit-desc">Client architectural sign-offs and dimension revisions are reviewed 65% faster.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── 7. Final CTA Section ─── -->
+<section class="final-cta-section">
+  <div class="wrap">
+    <h2 class="cta-title reveal">Ready to Put Your Business on <span class="gradient-text">Autopilot?</span></h2>
+    <p class="cta-desc reveal reveal-delay-1">Bring your workflows, teams, and manufacturing operations together with FlowPilot.</p>
+    <div style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;" class="reveal reveal-delay-2">
+      <a href="login.html?view=signup" class="btn btn-primary" style="padding:0.95rem 2.2rem; font-size:1.05rem;">
+        <span>Start Your Workflow</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="app.html" class="btn btn-secondary" style="padding:0.95rem 2rem;">Explore Live Workspace</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Footer ─── -->
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top-grid">
+      <div>
+        <a href="index.html" class="brand-logo" style="margin-bottom:0.5rem;">
+          <div class="brand-icon-box" style="width:32px; height:32px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          Flow<span>Pilot</span>
+        </a>
+        <p style="color:var(--text-dim); margin-top:0.8rem; max-width:320px;">Intelligent workflow automation connecting people, processes, and logistics into one unified workspace.</p>
+      </div>
+
+      <div>
+        <div style="font-weight:700; color:#fff; margin-bottom:1rem; text-transform:uppercase; font-size:0.75rem;">Platform</div>
+        <ul class="footer-links">
+          <li><a href="app.html">Workspace App</a></li>
+          <li><a href="#dashboard-preview">Interactive Demo</a></li>
+          <li><a href="#features">Key Features</a></li>
+          <li><a href="#how">How It Works</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div style="font-weight:700; color:#fff; margin-bottom:1rem; text-transform:uppercase; font-size:0.75rem;">Mirrorverse Case</div>
+        <ul class="footer-links">
+          <li><a href="#mirrorverse">Custom Glass Solutions</a></li>
+          <li><a href="#features">CAD Blueprint Uploads</a></li>
+          <li><a href="#features">QC Stop Tasks</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div style="font-weight:700; color:#fff; margin-bottom:1rem; text-transform:uppercase; font-size:0.75rem;">Account</div>
+        <ul class="footer-links">
+          <li><a href="login.html?view=login">Sign In</a></li>
+          <li><a href="login.html?view=signup">Create Account</a></li>
+          <li><a href="app.html">Workspace Settings</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom-bar">
+      <div>&copy; 2026 FlowPilot Inc. All rights reserved.</div>
+      <span class="live-indicator"><span class="badge-dot"></span> All Systems Operational</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+function showToast(message) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<span style="color:var(--accent-cyan);">&#10003;</span> <span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.remove(); }, 3000);
+}
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Conditional logic simulator
+const cState = { framing: true, led: true, size: false, antiFog: true };
+function toggleCondition(type) {
+  cState[type] = !cState[type];
+  const card = document.getElementById('toggle' + type.charAt(0).toUpperCase() + type.slice(1));
+  if (card) card.classList.toggle('active', cState[type]);
+  const map = { framing: 'nodeFraming', led: 'nodeLed', size: 'nodeXl', antiFog: 'nodeAntiFog' };
+  const target = document.getElementById(map[type]);
+  if (target) {
+    target.style.display = cState[type] ? 'flex' : 'none';
+    showToast(type.toUpperCase() + (cState[type] ? ' added to flow' : ' removed from flow'));
+  }
+}
+
+// QC Stop task
+function toggleQcItem(item) {
+  item.classList.toggle('checked');
+  const box = item.querySelector('.qc-box-custom');
+  box.innerHTML = item.classList.contains('checked') ? '&#10003;' : '';
+}
+function approveQcGate() {
+  document.querySelectorAll('.qc-check-item').forEach(i => {
+    i.classList.add('checked');
+    i.querySelector('.qc-box-custom').innerHTML = '&#10003;';
+  });
+  document.getElementById('qcLockBanner').classList.add('unlocked');
+  document.getElementById('qcLockTitle').innerHTML = 'QC Sign-Off Certified &#10003;';
+  document.getElementById('qcLockTitle').style.color = 'var(--success)';
+  document.getElementById('qcLockSub').textContent = 'Certified by Lead QC &bull; Audit #QC-9042-PASS';
+  const btn = document.getElementById('btnTransitLabel');
+  btn.disabled = false;
+  btn.style.opacity = '1';
+  btn.style.cursor = 'pointer';
+  document.getElementById('btnApproveQc').style.display = 'none';
+  showToast('QC Certified. Transit Label unlocked.');
+}
+
+// Dashboard preview tabs
+function switchDashboardTab(tabId, btn) {
+  document.querySelectorAll('.dash-tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.dash-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById(tabId)?.classList.add('active');
+}
+</script>
+</body>
+</html>

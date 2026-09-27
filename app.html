@@ -1,0 +1,2255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FlowPilot — Operations &amp; Workflow Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   DESIGN TOKENS (SaaS Operations Dashboard)
+   ══════════════════════════════════════════════ */
+:root {
+  --bg: #f8fafc;
+  --sidebar-bg: #f1f5f9;
+  --surface: #ffffff;
+  --surface2: #f8fafc;
+  --surface-hover: #f1f5f9;
+  --border: #e2e8f0;
+  --border-subtle: #f1f5f9;
+  
+  --text: #0f172a;
+  --muted: #64748b;
+  --dim: #94a3b8;
+  
+  --accent: #4f46e5;
+  --accent-light: #6366f1;
+  --accent-pill: rgba(79, 70, 229, 0.08);
+  --accent-pill-hover: rgba(79, 70, 229, 0.12);
+  --accent-glow: rgba(79, 70, 229, 0.2);
+  
+  --success: #10b981;
+  --success-bg: rgba(16, 185, 129, 0.1);
+  --warning: #f59e0b;
+  --warning-bg: rgba(245, 158, 11, 0.1);
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.1);
+  --info: #3b82f6;
+  --info-bg: rgba(59, 130, 246, 0.1);
+  
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 6px 20px rgba(0, 0, 0, 0.02);
+  --shadow-hover: 0 4px 14px rgba(0, 0, 0, 0.08);
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 13px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+}
+
+[data-theme="dark"] {
+  --bg: #0b1220;
+  --sidebar-bg: #0f172a;
+  --surface: #111827;
+  --surface2: #1e293b;
+  --surface-hover: #1f293d;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --dim: #64748b;
+  
+  --accent: #818cf8;
+  --accent-light: #a5b4fc;
+  --accent-pill: rgba(129, 140, 248, 0.14);
+  --accent-pill-hover: rgba(129, 140, 248, 0.22);
+  --accent-glow: rgba(129, 140, 248, 0.2);
+  
+  --success: #10b981;
+  --success-bg: rgba(16, 185, 129, 0.15);
+  --warning: #f59e0b;
+  --warning-bg: rgba(245, 158, 11, 0.15);
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.15);
+  --info: #38bdf8;
+  --info-bg: rgba(56, 189, 248, 0.15);
+  
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.25);
+  --shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* ══════════════════════════════════════════════
+   RESET & LAYOUT SHELL
+   ══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+input, select, textarea { font-family: inherit; }
+
+/* 2-Column App Container (Fixed Sidebar + Scrollable Viewport) */
+.saas-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* ══════════════════════════════════════════════
+   LEFT SIDEBAR (Fixed, ~228px)
+   ══════════════════════════════════════════════ */
+.sidebar {
+  width: 228px;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-shrink: 0;
+  padding: 1.1rem 0.85rem;
+  z-index: 20;
+}
+.sidebar-top {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 1.18rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+.nav-menu {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.nav-item-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--muted);
+  transition: all 0.18s ease;
+  position: relative;
+}
+.nav-item-btn:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+.nav-item-btn.active {
+  background: var(--accent-pill);
+  color: var(--accent);
+  font-weight: 700;
+}
+.nav-item-btn svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  color: inherit;
+}
+.nav-badge-count {
+  margin-left: auto;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  color: var(--muted);
+}
+.nav-item-btn.active .nav-badge-count {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* Sidebar Footer / User Profile */
+.sidebar-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.user-profile-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.avatar-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #a855f7);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.user-info-text { font-size: 0.8rem; font-weight: 600; color: var(--text); line-height: 1.2; }
+.user-info-sub { font-size: 0.7rem; color: var(--muted); }
+
+/* ══════════════════════════════════════════════
+   MAIN VIEWPORT (Header + Content)
+   ══════════════════════════════════════════════ */
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* Top Bar */
+.topbar {
+  height: 64px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-shrink: 0;
+  z-index: 10;
+}
+.topbar-left {
+  display: flex;
+  flex-direction: column;
+}
+.topbar-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+.topbar-subtitle {
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+.topbar-search-wrap {
+  flex: 1;
+  max-width: 440px;
+  position: relative;
+}
+.search-icon-svg {
+  position: absolute;
+  top: 50%;
+  left: 11px;
+  transform: translateY(-50%);
+  color: var(--muted);
+  width: 15px;
+  height: 15px;
+  pointer-events: none;
+}
+.topbar-search-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.45rem 0.8rem 0.45rem 2.1rem;
+  font-size: 0.83rem;
+  color: var(--text);
+  outline: none;
+  transition: all 0.2s;
+}
+.topbar-search-input:focus {
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.workspace-selector {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.45rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+}
+.btn-new-task {
+  padding: 0.45rem 0.95rem;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: all 0.2s;
+}
+.btn-new-task:hover {
+  background: var(--surface2);
+  border-color: var(--muted);
+}
+.btn-create-workflow {
+  padding: 0.45rem 1rem;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--accent);
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px var(--accent-glow);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s;
+}
+.btn-create-workflow:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+.btn-icon-top {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.2s;
+}
+.btn-icon-top:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+
+/* Scrollable Viewport Body */
+.viewport-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 1.8rem 3rem;
+}
+.tab-view { display: none; }
+.tab-view.active { display: block; animation: viewFadeIn 0.25s ease-out; }
+@keyframes viewFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════════════════════
+   1. STAT CARD ROW (4 Equal Cards)
+   ══════════════════════════════════════════════ */
+.stat-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 1.4rem;
+}
+.stat-card-clean {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.15rem 1.3rem;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 104px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.stat-card-clean:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+.stat-card-clean .stat-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+.stat-card-clean .stat-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: 0.4rem;
+}
+.stat-big-num {
+  font-size: 1.95rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  line-height: 1;
+}
+.trend-pill-green {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--success);
+  background: var(--success-bg);
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+}
+.sparkline-svg {
+  width: 90px;
+  height: 28px;
+  overflow: visible;
+}
+
+/* ══════════════════════════════════════════════
+   2. MAIN WORKFLOW BUILDER (70%) + DETAIL INSPECTOR (30%)
+   ══════════════════════════════════════════════ */
+.builder-split-row {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.1rem;
+  margin-bottom: 1.4rem;
+}
+.workflow-builder-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.wb-card-header {
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.wb-stage-select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+}
+.time-saved-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--accent-pill);
+  color: var(--accent);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-full);
+}
+
+/* Node-Based Flow Diagram Canvas */
+.flow-diagram-canvas {
+  flex: 1;
+  min-height: 280px;
+  padding: 2.5rem 1.5rem;
+  background: radial-gradient(circle, var(--border-subtle) 1px, transparent 1px);
+  background-size: 18px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow-x: auto;
+}
+.nodes-chain {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.node-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 0.75rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 170px;
+  position: relative;
+}
+.node-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-hover);
+}
+.node-card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+.node-icon-box {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.node-title-bold { font-size: 0.84rem; font-weight: 700; color: var(--text); line-height: 1.2; }
+.node-sub-muted { font-size: 0.7rem; color: var(--muted); }
+
+/* Merge circular icon */
+.merge-node-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  margin: 0 1.2rem;
+  flex-shrink: 0;
+}
+
+/* Connecting Arrows */
+.arrow-svg-line {
+  color: var(--border);
+  width: 40px;
+  height: 24px;
+}
+
+/* Detail Inspector Right Panel */
+.detail-inspector-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.inspector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.1rem;
+}
+.insp-title { font-size: 0.95rem; font-weight: 800; color: var(--text); }
+.insp-section-block {
+  margin-bottom: 1rem;
+}
+.insp-section-lbl {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+}
+.pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.tag-pill-sm {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.tool-call-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+.toggle-switch-ui {
+  width: 34px;
+  height: 18px;
+  border-radius: 12px;
+  background: #cbd5e1;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.toggle-switch-ui.on {
+  background: var(--accent);
+}
+.toggle-switch-ui::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: transform 0.2s;
+}
+.toggle-switch-ui.on::after {
+  transform: translateX(16px);
+}
+.confidence-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 0.6rem 0 1rem;
+}
+.conf-high { color: var(--success); font-weight: 700; }
+.insp-buttons-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+}
+.btn-insp-save {
+  padding: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-align: center;
+  transition: all 0.2s;
+}
+.btn-insp-save:hover { background: var(--surface2); }
+.btn-insp-publish {
+  padding: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border-radius: var(--radius-md);
+  text-align: center;
+  transition: all 0.2s;
+}
+.btn-insp-publish:hover { opacity: 0.92; }
+
+/* Bottlenecks Detected Card */
+.bottlenecks-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.8rem;
+}
+.bn-header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+.bn-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.bn-item {
+  font-size: 0.74rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.bn-item:hover { color: var(--accent); }
+
+/* ══════════════════════════════════════════════
+   3. BOTTOM PANEL: RECENT RUNS TABLE (Full Width)
+   ══════════════════════════════════════════════ */
+.recent-runs-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.runs-header {
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.runs-title { font-size: 0.95rem; font-weight: 800; color: var(--text); }
+.runs-actions { display: flex; gap: 0.5rem; }
+.btn-run-tool {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: all 0.2s;
+}
+.btn-run-tool:hover { background: var(--surface2); color: var(--text); }
+
+.runs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+}
+.runs-table th {
+  text-align: left;
+  padding: 0.7rem 1.1rem;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+.runs-table td {
+  padding: 0.8rem 1.1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text);
+  vertical-align: middle;
+}
+.runs-table tr:hover td { background: var(--surface-hover); }
+.run-id-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: var(--accent);
+}
+.status-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.status-succeeded { color: var(--success); background: var(--success-bg); }
+.status-waiting { color: var(--warning); background: var(--warning-bg); }
+.status-failed { color: var(--danger); background: var(--danger-bg); }
+
+.progress-bar-wrap {
+  width: 80px;
+  height: 6px;
+  background: var(--surface2);
+  border-radius: 3px;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+/* ══════════════════════════════════════════════
+   TASKS VIEW & OTHER TAB INTEGRATIONS
+   ══════════════════════════════════════════════ */
+.tasks-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-card);
+}
+.task-form-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr auto;
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+}
+.form-input-clean {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius-md);
+  padding: 0.45rem 0.7rem;
+  font-size: 0.82rem;
+  outline: none;
+}
+.form-input-clean:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+.task-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.task-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+}
+.task-table th {
+  text-align: left;
+  padding: 0.65rem 0.9rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+.task-table td {
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.task-table tr:hover td { background: var(--surface-hover); }
+
+/* ══════════════════════════════════════════════
+   REPORTS TAB — ENRICHED DETAIL CARDS
+   ══════════════════════════════════════════════ */
+.reports-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+.chart-box-clean {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.4rem;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.chart-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.2rem;
+}
+.chart-header-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.chart-header-sub {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 0.9rem;
+}
+.chart-kpi-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+}
+.chart-box-clean canvas {
+  width: 100% !important;
+  height: 200px !important;
+}
+.chart-legend-box {
+  margin-top: 0.8rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  font-size: 0.78rem;
+}
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* Modals & Toasts */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 520px;
+  box-shadow: var(--shadow-hover);
+}
+.toast-stack {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.toast-msg {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  padding: 0.75rem 1.1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.83rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-hover);
+  animation: slideToast 0.25s ease-out;
+}
+@keyframes slideToast {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1024px) {
+  .stat-cards-grid { grid-template-columns: 1fr 1fr; }
+  .builder-split-row { grid-template-columns: 1fr; }
+  .reports-charts-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .saas-container { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+  .stat-cards-grid { grid-template-columns: 1fr; }
+  .task-form-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="saas-container">
+  <!-- ══════════════════════════════════════════════
+       LEFT SIDEBAR (Fixed, ~228px)
+       ══════════════════════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <a href="index.html" class="sidebar-brand" title="Back to FlowPilot Landing Page">
+        <div class="brand-mark">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </div>
+        FlowPilot
+      </a>
+
+      <!-- Vertical Nav with Clean Icons & Soft Indigo-Tinted Active Pill -->
+      <ul class="nav-menu">
+        <li>
+          <button class="nav-item-btn active" data-tab="tab-dashboard" onclick="setAppTab('tab-dashboard', 'Workflow Dashboard')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Dashboard</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-item-btn" data-tab="tab-tasks" onclick="setAppTab('tab-tasks', 'Task Operations')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <span>Tasks</span>
+            <span class="nav-badge-count" id="activeTasksCount">6</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-item-btn" data-tab="tab-team" onclick="setAppTab('tab-team', 'Team Capacity')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Team</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-item-btn" data-tab="tab-automations" onclick="setAppTab('tab-automations', 'Automations & Rules')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>Automations</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-item-btn" data-tab="tab-reports" onclick="setAppTab('tab-reports', 'Performance Reports')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Reports</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-item-btn" data-tab="tab-integrations" onclick="setAppTab('tab-integrations', 'Integrations')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            <span>Integrations</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-item-btn" data-tab="tab-settings" onclick="setAppTab('tab-settings', 'Workspace Settings')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Settings</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Sidebar Bottom Profile / Theme Switcher / Sign Out -->
+    <div class="sidebar-footer">
+      <div class="user-profile-summary">
+        <div class="avatar-circle">AR</div>
+        <div>
+          <div class="user-info-text">Alex Rivera</div>
+          <a href="login.html?view=login" style="font-size:0.68rem; color:var(--accent); text-decoration:underline;">Sign Out</a>
+        </div>
+      </div>
+      <button class="btn-icon-top" onclick="toggleThemeQuick()" title="Toggle Dark/Light Mode">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════════════════════════════
+       MAIN WRAPPER (Top Bar + Dynamic Viewport)
+       ══════════════════════════════════════════════ -->
+  <div class="main-wrapper">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="topbar-title" id="pageTitleText">Workflow Dashboard</h1>
+        <span class="topbar-subtitle">Modern workflow &amp; task automation operations</span>
+      </div>
+
+      <!-- Centered Search -->
+      <div class="topbar-search-wrap">
+        <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="topbar-search-input" id="globalSearchInput" placeholder="Search tasks, workflows, people..." oninput="handleGlobalSearch(this.value)">
+      </div>
+
+      <!-- Right Actions -->
+      <div class="topbar-actions">
+        <select class="workspace-selector" onchange="showToast('Workspace switched to: ' + this.value)">
+          <option value="Mirrorverse Operations">Mirrorverse Workspace</option>
+          <option value="Corporate Operations">Corporate Operations</option>
+          <option value="Field Logistics">Field Logistics</option>
+        </select>
+
+        <a href="index.html" class="btn-new-task" style="display:inline-flex; align-items:center; gap:4px;" title="Back to Landing Page">
+          <span>Website</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+
+        <button class="btn-new-task" onclick="setAppTab('tab-tasks', 'Task Operations'); showToast('Task creator activated.');">New Task</button>
+        <button class="btn-create-workflow" onclick="showToast('Workflow Builder wizard opened.')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Create Workflow</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Scrollable Viewport Body -->
+    <main class="viewport-content">
+      <!-- ══════════════════════════════════════════════
+           TAB: DASHBOARD (Core Operations View)
+           ══════════════════════════════════════════════ -->
+      <div class="tab-view active" id="tab-dashboard">
+        <!-- 1. Stat Card Row (4 Cards, Equal Width) -->
+        <div class="stat-cards-grid">
+          <!-- Card 1 -->
+          <div class="stat-card-clean">
+            <div class="stat-top">
+              <span>Avg completion time</span>
+              <span class="trend-pill-green">+14%</span>
+            </div>
+            <div class="stat-bottom">
+              <div class="stat-big-num">18.4m</div>
+              <svg class="sparkline-svg" viewBox="0 0 90 28" fill="none">
+                <path d="M2 24 L22 18 L42 21 L62 10 L88 4" stroke="#10b981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="stat-card-clean">
+            <div class="stat-top">
+              <span>Tasks completed today</span>
+              <span style="font-size: 0.72rem; color: var(--muted);">On schedule</span>
+            </div>
+            <div class="stat-bottom">
+              <div class="stat-big-num">142</div>
+              <svg class="sparkline-svg" viewBox="0 0 90 28" fill="none">
+                <path d="M2 22 L20 16 L38 23 L58 12 L72 17 L88 3" stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="stat-card-clean">
+            <div class="stat-top">
+              <span>Automation rate</span>
+              <span class="trend-pill-green">+8.2%</span>
+            </div>
+            <div class="stat-bottom">
+              <div class="stat-big-num">84.6%</div>
+              <svg class="sparkline-svg" viewBox="0 0 90 28" fill="none">
+                <path d="M2 20 L22 18 L40 12 L60 14 L88 2" stroke="#10b981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="stat-card-clean">
+            <div class="stat-top">
+              <span>Approvals pending</span>
+              <span style="font-size: 0.72rem; color: var(--warning); font-weight: 600;">Action needed</span>
+            </div>
+            <div class="stat-bottom">
+              <div class="stat-big-num" style="color: var(--warning);">7</div>
+              <svg class="sparkline-svg" viewBox="0 0 90 28" fill="none">
+                <path d="M2 15 L22 24 L42 12 L62 20 L88 8" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Main Workflow Builder (70%) + Detail Inspector (30%) -->
+        <div class="builder-split-row">
+          <!-- Main Panel: Workflow Builder (~70%) -->
+          <div class="workflow-builder-card">
+            <div class="wb-card-header">
+              <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <select class="wb-stage-select">
+                  <option>Staging</option>
+                  <option>Production Live</option>
+                  <option>Draft Rev 2</option>
+                </select>
+                <span style="font-size: 0.78rem; color: var(--muted);">&bull; Trigger: Webhook / New Task</span>
+              </div>
+              <div class="time-saved-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Estimated time saved: 2h 10m per request</span>
+              </div>
+            </div>
+
+            <!-- Visual Flow Diagram -->
+            <div class="flow-diagram-canvas">
+              <div class="nodes-chain">
+                <!-- Node 1: New Task Created -->
+                <div class="node-card selected" onclick="selectFlowNode('New Task Created', 'Webhook / Manual', 'High (0.94)')">
+                  <div class="node-icon-box">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  </div>
+                  <div>
+                    <div class="node-title-bold">New Task Created</div>
+                    <div class="node-sub-muted">Trigger: Any channel</div>
+                  </div>
+                </div>
+
+                <!-- Connector Arrow 1 -->
+                <svg class="arrow-svg-line" viewBox="0 0 40 24" fill="none">
+                  <path d="M0 12 H32 M24 6 L32 12 L24 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+
+                <!-- Node 2: Auto-assign -->
+                <div class="node-card" onclick="selectFlowNode('Auto-assign', 'Rule Engine', 'High (0.91)')">
+                  <div class="node-icon-box">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
+                  <div>
+                    <div class="node-title-bold">Auto-assign</div>
+                    <div class="node-sub-muted">Load balanced algorithm</div>
+                  </div>
+                </div>
+
+                <!-- Branching Connector SVG -->
+                <svg class="arrow-svg-line" style="width: 50px;" viewBox="0 0 50 40" fill="none">
+                  <path d="M0 20 C20 20 25 20 40 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+
+                <!-- Merge Circular Node -->
+                <div class="merge-node-circle" title="Merge node">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>
+                </div>
+
+                <!-- Connector Arrow to Node 3 -->
+                <svg class="arrow-svg-line" viewBox="0 0 40 24" fill="none">
+                  <path d="M0 12 H32 M24 6 L32 12 L24 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+
+                <!-- Node 3: Notify Assignee -->
+                <div class="node-card" onclick="selectFlowNode('Notify assignee', 'Notification Dispatcher', 'High (0.99)')">
+                  <div class="node-icon-box">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  </div>
+                  <div>
+                    <div class="node-title-bold">Notify assignee</div>
+                    <div class="node-sub-muted">Email, Slack &amp; App bell</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Side Panel: Detail Inspector (~30%) -->
+          <div class="detail-inspector-card">
+            <div>
+              <div class="inspector-header">
+                <span class="insp-title" id="inspectorNodeTitle">Node Details</span>
+                <button class="btn-icon-top" style="width:28px;height:28px;" onclick="showToast('Node properties menu')">...</button>
+              </div>
+
+              <!-- Inputs Section -->
+              <div class="insp-section-block">
+                <div class="insp-section-lbl">Inputs</div>
+                <div class="pills-row">
+                  <span class="tag-pill-sm">Inputs</span>
+                  <span class="tag-pill-sm">Auto-assign</span>
+                  <span class="tag-pill-sm">Task Metadata</span>
+                </div>
+              </div>
+
+              <!-- Decisions Section -->
+              <div class="insp-section-block">
+                <div class="insp-section-lbl">Decisions</div>
+                <div class="pills-row">
+                  <span class="tag-pill-sm" style="color: var(--accent);">Manager approval</span>
+                </div>
+              </div>
+
+              <!-- Tool Calls Section with Toggles -->
+              <div class="insp-section-block">
+                <div class="insp-section-lbl">Tool calls</div>
+                <div class="tool-call-row">
+                  <span>Notify assignee</span>
+                  <div class="toggle-switch-ui on" onclick="this.classList.toggle('on'); showToast('Toggle updated: Notify assignee');"></div>
+                </div>
+                <div class="tool-call-row">
+                  <span>Manager approval</span>
+                  <div class="toggle-switch-ui on" onclick="this.classList.toggle('on'); showToast('Toggle updated: Manager approval');"></div>
+                </div>
+              </div>
+
+              <div class="confidence-box">
+                <span>Confidence Score:</span>
+                <span class="conf-high" id="inspConfidence">High (0.91)</span>
+              </div>
+
+              <div class="insp-buttons-row">
+                <button class="btn-insp-save" onclick="showToast('Workflow configuration saved.')">Save</button>
+                <button class="btn-insp-publish" onclick="showToast('Workflow published to live operations.')">Publish</button>
+              </div>
+            </div>
+
+            <!-- Bottlenecks Detected Card -->
+            <div class="bottlenecks-card">
+              <div class="bn-header">
+                <span>💡</span>
+                <span>Bottlenecks detected</span>
+              </div>
+              <ul class="bn-list">
+                <li class="bn-item" onclick="showToast('Analyzing approval wait time...')">
+                  <span>Manager approval queue avg 4.2h</span>
+                  <span>&rarr;</span>
+                </li>
+                <li class="bn-item" onclick="showToast('Optimizing auto-assignment...')">
+                  <span>Auto-assign retry frequency</span>
+                  <span>&rarr;</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Bottom Panel: Recent Runs Table (Full Width) -->
+        <div class="recent-runs-card">
+          <div class="runs-header">
+            <div class="runs-title">Recent Runs</div>
+            <div class="runs-actions">
+              <button class="btn-run-tool" onclick="showToast('Exported recent runs log as CSV.')">Export</button>
+              <button class="btn-run-tool" onclick="showToast('Generating operations run report...')">Report</button>
+            </div>
+          </div>
+
+          <table class="runs-table">
+            <thead>
+              <tr>
+                <th>Run ID</th>
+                <th>Workflow</th>
+                <th>Status</th>
+                <th>Duration</th>
+                <th>Approvals Progress</th>
+                <th>Time Saved</th>
+                <th>Started</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="run-id-code">#RUN-8842</td>
+                <td>New Task Created</td>
+                <td><span class="status-pill status-succeeded">&#9679; Succeeded</span></td>
+                <td>2h 24m</td>
+                <td>
+                  <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width: 100%;"></div></div>
+                  <span style="font-size: 0.72rem; color: var(--muted); margin-left: 6px;">100%</span>
+                </td>
+                <td style="font-weight: 600;">2h 10m</td>
+                <td style="color: var(--muted);">11 min ago</td>
+              </tr>
+              <tr>
+                <td class="run-id-code">#RUN-8841</td>
+                <td>Mirrorverse Production Pipeline</td>
+                <td><span class="status-pill status-waiting">&#9679; Waiting</span></td>
+                <td>1h 00m</td>
+                <td>
+                  <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width: 65%; background: var(--warning);"></div></div>
+                  <span style="font-size: 0.72rem; color: var(--muted); margin-left: 6px;">65%</span>
+                </td>
+                <td style="font-weight: 600;">1h 18m</td>
+                <td style="color: var(--muted);">42 min ago</td>
+              </tr>
+              <tr>
+                <td class="run-id-code">#RUN-8839</td>
+                <td>QC Stop Task Verification</td>
+                <td><span class="status-pill status-failed">&#9679; Failed</span></td>
+                <td>2h 30m</td>
+                <td>
+                  <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width: 30%; background: var(--danger);"></div></div>
+                  <span style="font-size: 0.72rem; color: var(--muted); margin-left: 6px;">30%</span>
+                </td>
+                <td style="font-weight: 600;">2h 10m</td>
+                <td style="color: var(--muted);">2 hours ago</td>
+              </tr>
+              <tr>
+                <td class="run-id-code">#RUN-8835</td>
+                <td>Logistics Freight Partner Dispatch</td>
+                <td><span class="status-pill status-succeeded">&#9679; Succeeded</span></td>
+                <td>45m</td>
+                <td>
+                  <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width: 100%;"></div></div>
+                  <span style="font-size: 0.72rem; color: var(--muted); margin-left: 6px;">100%</span>
+                </td>
+                <td style="font-weight: 600;">35m</td>
+                <td style="color: var(--muted);">3 hours ago</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           TAB: TASKS (Complete Operations Task Board)
+           ══════════════════════════════════════════════ -->
+      <div class="tab-view" id="tab-tasks">
+        <div class="tasks-panel">
+          <!-- Task Form -->
+          <form class="task-form-grid" id="taskForm" onsubmit="handleAddTask(event)">
+            <input class="form-input-clean" type="text" id="tTitle" placeholder="Task title / specification..." required>
+            <select class="form-input-clean" id="tAssignee"></select>
+            <input class="form-input-clean" type="date" id="tDeadline" required>
+            <select class="form-input-clean" id="tPriority">
+              <option value="high">High Priority</option>
+              <option value="medium" selected>Medium Priority</option>
+              <option value="low">Low Priority</option>
+            </select>
+            <select class="form-input-clean" id="tProject">
+              <option value="">No Project</option>
+            </select>
+            <select class="form-input-clean" id="tStatus">
+              <option value="todo">To Do</option>
+              <option value="in-progress">In Progress</option>
+              <option value="done">Done</option>
+            </select>
+            <button class="btn-create-workflow" type="submit">+ Add</button>
+          </form>
+
+          <!-- Filters -->
+          <div class="task-filter-bar">
+            <select class="form-input-clean" id="fStatus" onchange="renderTasks()">
+              <option value="">All Statuses</option>
+              <option value="todo">To Do</option>
+              <option value="in-progress">In Progress</option>
+              <option value="done">Done</option>
+            </select>
+            <select class="form-input-clean" id="fPriority" onchange="renderTasks()">
+              <option value="">All Priorities</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+            <select class="form-input-clean" id="fAssignee" onchange="renderTasks()">
+              <option value="">All Assignees</option>
+            </select>
+            <select class="form-input-clean" id="fProject" onchange="renderTasks()">
+              <option value="">All Projects</option>
+            </select>
+          </div>
+
+          <!-- Task Table -->
+          <table class="task-table">
+            <thead>
+              <tr>
+                <th>Task Title</th>
+                <th>Assignee</th>
+                <th>Deadline</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Project</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="taskTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           TAB: REPORTS (Enriched Canvas Analytics with Details)
+           ══════════════════════════════════════════════ -->
+      <div class="tab-view" id="tab-reports">
+        <div class="reports-charts-grid">
+          <!-- 1. Completion Trend -->
+          <div class="chart-box-clean">
+            <div>
+              <div class="chart-header-row">
+                <span class="chart-header-title">Completion Trend (7 Days)</span>
+                <span class="chart-kpi-badge" style="background:var(--success-bg); color:var(--success);">+24% vs Prev Week</span>
+              </div>
+              <div class="chart-header-sub">Daily velocity &bull; Total 168 tasks completed &bull; Peak: Sunday (42)</div>
+            </div>
+            <canvas id="chartTrend"></canvas>
+            <div class="chart-legend-box">
+              <span class="legend-item"><span class="legend-dot" style="background:#4f46e5;"></span> Daily Finished Tasks</span>
+              <span class="legend-item"><span style="color:var(--muted);">Rolling 7-day Avg:</span> <strong style="color:var(--text);">24 tasks/day</strong></span>
+            </div>
+          </div>
+
+          <!-- 2. Status Distribution -->
+          <div class="chart-box-clean">
+            <div>
+              <div class="chart-header-row">
+                <span class="chart-header-title">Status Distribution</span>
+                <span class="chart-kpi-badge" style="background:var(--accent-pill); color:var(--accent);">Live Pipeline</span>
+              </div>
+              <div class="chart-header-sub">Current distribution of active orders and manufacturing tasks</div>
+            </div>
+            <canvas id="chartStatus"></canvas>
+            <div class="chart-legend-box" id="donutLegendRow">
+              <span class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> Done: <span id="legDone">1 (17%)</span></span>
+              <span class="legend-item"><span class="legend-dot" style="background:#4f46e5;"></span> In Progress: <span id="legInprog">2 (33%)</span></span>
+              <span class="legend-item"><span class="legend-dot" style="background:#94a3b8;"></span> To Do: <span id="legTodo">3 (50%)</span></span>
+            </div>
+          </div>
+
+          <!-- 3. Team Workload Capacity -->
+          <div class="chart-box-clean">
+            <div>
+              <div class="chart-header-row">
+                <span class="chart-header-title">Team Workload Capacity</span>
+                <span class="chart-kpi-badge" style="background:rgba(59,130,246,0.1); color:var(--info);">Team Load: Balanced</span>
+              </div>
+              <div class="chart-header-sub">Active tasks per specialist vs maximum safe capacity (5 tasks max)</div>
+            </div>
+            <canvas id="chartWorkload"></canvas>
+            <div class="chart-legend-box">
+              <span class="legend-item"><span class="legend-dot" style="background:#4f46e5;"></span> Current Assigned</span>
+              <span class="legend-item"><span class="legend-dot" style="background:var(--surface2); border:1px solid var(--border);"></span> Remaining Bandwidth</span>
+            </div>
+          </div>
+
+          <!-- 4. Priority Breakdown -->
+          <div class="chart-box-clean">
+            <div>
+              <div class="chart-header-row">
+                <span class="chart-header-title">Priority Breakdown</span>
+                <span class="chart-kpi-badge" style="background:var(--danger-bg); color:var(--danger);">2 Critical Orders</span>
+              </div>
+              <div class="chart-header-sub">Severity classification and associated delivery SLA targets</div>
+            </div>
+            <canvas id="chartPriority"></canvas>
+            <div class="chart-legend-box">
+              <span class="legend-item"><span class="legend-dot" style="background:#ef4444;"></span> High (&lt;24h)</span>
+              <span class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span> Medium (3-Day)</span>
+              <span class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> Low (Flexible)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           TAB: TEAM
+           ══════════════════════════════════════════════ -->
+      <div class="tab-view" id="tab-team">
+        <div class="tasks-panel">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem;">
+            <h2 style="font-size:1.1rem; font-weight:700;">Team Members &amp; Capacity</h2>
+            <button class="btn-create-workflow" onclick="showToast('Member invitation link copied.')">+ Add Member</button>
+          </div>
+          <div id="teamGridList" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:1.1rem;"></div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           TAB: AUTOMATIONS
+           ══════════════════════════════════════════════ -->
+      <div class="tab-view" id="tab-automations">
+        <div class="tasks-panel">
+          <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:1.2rem;">Active Automation Rules</h2>
+          <div style="display:flex; flex-direction:column; gap:0.8rem;">
+            <div style="background:var(--surface2); padding:1rem; border-radius:10px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div style="font-weight:700;">Auto-Assign New Order to Lead CAD Drafter</div>
+                <div style="font-size:0.78rem; color:var(--muted);">Trigger: Order Created with .DWG attachment &bull; Action: Assign to Alex Rivera</div>
+              </div>
+              <div class="toggle-switch-ui on" onclick="this.classList.toggle('on');"></div>
+            </div>
+            <div style="background:var(--surface2); padding:1rem; border-radius:10px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div style="font-weight:700;">Stop Task Gatekeeper for Quality Control</div>
+                <div style="font-size:0.78rem; color:var(--muted);">Trigger: Assembly Completed &bull; Action: Hard lock transit label generation</div>
+              </div>
+              <div class="toggle-switch-ui on" onclick="this.classList.toggle('on');"></div>
+            </div>
+            <div style="background:var(--surface2); padding:1rem; border-radius:10px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div style="font-weight:700;">FreightLogix White Glove Pickup SMS Notification</div>
+                <div style="font-size:0.78rem; color:var(--muted);">Trigger: Packaging Approved &bull; Action: Dispatch webhook to carrier</div>
+              </div>
+              <div class="toggle-switch-ui on" onclick="this.classList.toggle('on');"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           TAB: INTEGRATIONS
+           ══════════════════════════════════════════════ -->
+      <div class="tab-view" id="tab-integrations">
+        <div class="tasks-panel">
+          <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:1.2rem;">Connected Integrations</h2>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.1rem;">
+            <div style="background:var(--surface2); padding:1.2rem; border-radius:12px; border:1px solid var(--border);">
+              <h4 style="font-weight:700; margin-bottom:4px;">FreightLogix Carrier API</h4>
+              <p style="font-size:0.8rem; color:var(--muted); margin-bottom:0.8rem;">Direct electronic bill of lading &amp; tracking integration.</p>
+              <span class="status-pill status-succeeded">&#10003; Connected</span>
+            </div>
+            <div style="background:var(--surface2); padding:1.2rem; border-radius:12px; border:1px solid var(--border);">
+              <h4 style="font-weight:700; margin-bottom:4px;">Mirrorverse CAD Cloud</h4>
+              <p style="font-size:0.8rem; color:var(--muted); margin-bottom:0.8rem;">Auto-renders 3D mirror bevel and LED channel blueprints.</p>
+              <span class="status-pill status-succeeded">&#10003; Connected</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           TAB: SETTINGS
+           ══════════════════════════════════════════════ -->
+      <div class="tab-view" id="tab-settings">
+        <div class="tasks-panel">
+          <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:1.2rem;">Appearance &amp; Data Operations</h2>
+          <div style="display:flex; flex-direction:column; gap:1.2rem;">
+            <div style="display:flex; align-items:center; gap:1rem;">
+              <span style="font-weight:600; width:120px;">Theme Mode:</span>
+              <button class="btn-run-tool" onclick="setThemeMode('light')">Light</button>
+              <button class="btn-run-tool" onclick="setThemeMode('dark')">Dark</button>
+              <button class="btn-run-tool" onclick="setThemeMode('auto')">Auto / System</button>
+            </div>
+            <div style="display:flex; align-items:center; gap:1rem;">
+              <span style="font-weight:600; width:120px;">Data Backup:</span>
+              <button class="btn-run-tool" onclick="exportDataJson()">📥 Export JSON</button>
+              <button class="btn-run-tool" onclick="resetData()">🗑️ Reset Demo Data</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Comment Modal -->
+<div class="modal-overlay" id="commentModal">
+  <div class="modal-card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+      <h3 id="commentModalTitle" style="font-size:1rem; font-weight:700;">Task Comments</h3>
+      <button onclick="closeCommentModal()" style="font-size:1.2rem; color:var(--muted);">&times;</button>
+    </div>
+    <div id="commentModalList" style="max-height:220px; overflow-y:auto; margin-bottom:1rem; display:flex; flex-direction:column; gap:0.6rem;"></div>
+    <div style="display:flex; gap:0.5rem;">
+      <input type="text" class="form-input-clean" id="commentInput" placeholder="Write a comment..." style="flex:1;">
+      <button class="btn-create-workflow" onclick="submitComment()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Stack -->
+<div class="toast-stack" id="toastStack"></div>
+
+<script>
+/* ══════════════════════════════════════════════
+   FLOWPILOT CORE APPLICATION SCRIPT
+   ══════════════════════════════════════════════ */
+const STORAGE_KEY = "flowpilot-v2";
+
+let state = loadState();
+
+function defaultState() {
+  const d = (n) => { const dt = new Date(); dt.setDate(dt.getDate() + n); return dt.toISOString().slice(0, 10); };
+  return {
+    members: [
+      { id: 1, name: "Alex Rivera", role: "Lead Operations" },
+      { id: 2, name: "Sam Chen", role: "CAD Drafter" },
+      { id: 3, name: "Jordan Lee", role: "QC Inspector" },
+      { id: 4, name: "Elena Rostova", role: "Certified Lead QC" }
+    ],
+    projects: [
+      { id: 1, name: "Mirrorverse Bespoke", color: "#6366f1" },
+      { id: 2, name: "Hospitality Multi-Unit", color: "#10b981" }
+    ],
+    tasks: [
+      { id: 1, title: "CAD blueprint tolerance inspection (48x72\")", assignee: 1, deadline: d(-2), priority: "high", status: "in-progress", project: 1, comments: [] },
+      { id: 2, title: "Precision CNC glass bevel polish", assignee: 2, deadline: d(2), priority: "medium", status: "todo", project: 1, comments: [] },
+      { id: 3, title: "LED 3000K driver burn-in test", assignee: 3, deadline: d(-1), priority: "high", status: "in-progress", project: 1, comments: [] },
+      { id: 4, title: "Triple-ply wooden crate fabrication", assignee: 2, deadline: d(3), priority: "low", status: "todo", project: 2, comments: [] },
+      { id: 5, title: "Stop Task: Final optical silvering audit", assignee: 4, deadline: d(1), priority: "high", status: "todo", project: 1, comments: [] },
+      { id: 6, title: "FreightLogix carrier bill of lading sign-off", assignee: 1, deadline: d(4), priority: "medium", status: "done", project: 2, comments: [] }
+    ]
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return defaultState();
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// Toast
+function showToast(msg) {
+  const stack = document.getElementById('toastStack');
+  const toast = document.createElement('div');
+  toast.className = 'toast-msg';
+  toast.textContent = msg;
+  stack.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transition = 'all 0.3s';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// Tab navigation
+function setAppTab(tabId, pageTitle) {
+  document.querySelectorAll('.nav-item-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+  });
+  document.querySelectorAll('.tab-view').forEach(view => {
+    view.classList.toggle('active', view.id === tabId);
+  });
+  const titleEl = document.getElementById('pageTitleText');
+  if (titleEl) titleEl.textContent = pageTitle;
+
+  if (tabId === 'tab-reports') {
+    setTimeout(renderAllCharts, 80);
+  }
+}
+
+// Flow node selector
+function selectFlowNode(name, source, conf) {
+  document.querySelectorAll('.node-card').forEach(n => {
+    const title = n.querySelector('.node-title-bold')?.textContent;
+    n.classList.toggle('selected', title === name);
+  });
+  const inspTitle = document.getElementById('inspectorNodeTitle');
+  if (inspTitle) inspTitle.textContent = name;
+  const confEl = document.getElementById('inspConfidence');
+  if (confEl) confEl.textContent = conf;
+  showToast('Inspecting: ' + name);
+}
+
+// Quick theme switch
+function toggleThemeQuick() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  setThemeMode(next);
+}
+
+function setThemeMode(mode) {
+  if (mode === 'auto') {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.removeItem('flowpilot-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', mode);
+    localStorage.setItem('flowpilot-theme', mode);
+  }
+  showToast('Theme set to: ' + mode);
+  setTimeout(renderAllCharts, 100);
+}
+
+// Init theme on load
+(function() {
+  const saved = localStorage.getItem('flowpilot-theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+})();
+
+// Render Tasks
+function renderTasks() {
+  const tbody = document.getElementById('taskTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const fStatus = document.getElementById('fStatus')?.value || '';
+  const fPriority = document.getElementById('fPriority')?.value || '';
+  const fAssignee = document.getElementById('fAssignee')?.value || '';
+  const fProject = document.getElementById('fProject')?.value || '';
+
+  const filtered = state.tasks.filter(t => {
+    if (fStatus && t.status !== fStatus) return false;
+    if (fPriority && t.priority !== fPriority) return false;
+    if (fAssignee && String(t.assignee) !== fAssignee) return false;
+    if (fProject && String(t.project) !== fProject) return false;
+    return true;
+  });
+
+  const activeCountEl = document.getElementById('activeTasksCount');
+  if (activeCountEl) activeCountEl.textContent = state.tasks.filter(t => t.status !== 'done').length;
+
+  filtered.forEach(t => {
+    const member = state.members.find(m => m.id === t.assignee);
+    const proj = state.projects.find(p => p.id === t.project);
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <strong style="color:var(--text); cursor:pointer;" onclick="openComments(${t.id})">${t.title}</strong>
+      </td>
+      <td>${member ? member.name : 'Unassigned'}</td>
+      <td style="color:${new Date(t.deadline) < new Date() && t.status !== 'done' ? 'var(--danger)' : 'var(--muted)'}; font-weight:600;">
+        ${t.deadline}
+      </td>
+      <td>
+        <span class="status-pill ${t.priority === 'high' ? 'status-failed' : t.priority === 'medium' ? 'status-waiting' : 'status-succeeded'}">
+          ${t.priority.toUpperCase()}
+        </span>
+      </td>
+      <td>
+        <span class="status-pill ${t.status === 'done' ? 'status-succeeded' : t.status === 'in-progress' ? 'status-waiting' : ''}" style="${t.status==='todo'?'background:var(--surface2); color:var(--muted);':''}">
+          ${t.status}
+        </span>
+      </td>
+      <td>
+        ${proj ? `<span class="tag-pill-sm" style="border-left:3px solid ${proj.color};">${proj.name}</span>` : '<span style="color:var(--dim);">-</span>'}
+      </td>
+      <td>
+        <button class="btn-run-tool" onclick="deleteTask(${t.id})" style="color:var(--danger); border-color:transparent;">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function handleAddTask(e) {
+  e.preventDefault();
+  const title = document.getElementById('tTitle').value.trim();
+  const assignee = parseInt(document.getElementById('tAssignee').value);
+  const deadline = document.getElementById('tDeadline').value;
+  const priority = document.getElementById('tPriority').value;
+  const project = parseInt(document.getElementById('tProject').value) || null;
+  const status = document.getElementById('tStatus').value;
+
+  const newTask = {
+    id: Date.now(),
+    title,
+    assignee,
+    deadline,
+    priority,
+    project,
+    status,
+    comments: []
+  };
+
+  state.tasks.unshift(newTask);
+  saveState();
+  renderTasks();
+  document.getElementById('taskForm').reset();
+  showToast('New task created: ' + title);
+}
+
+function deleteTask(id) {
+  state.tasks = state.tasks.filter(t => t.id !== id);
+  saveState();
+  renderTasks();
+  showToast('Task removed.');
+}
+
+// Populate dropdowns
+function populateDropdowns() {
+  const aSel = document.getElementById('tAssignee');
+  const faSel = document.getElementById('fAssignee');
+  const pSel = document.getElementById('tProject');
+  const fpSel = document.getElementById('fProject');
+
+  if (aSel) {
+    aSel.innerHTML = state.members.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  }
+  if (faSel) {
+    faSel.innerHTML = '<option value="">All Assignees</option>' + state.members.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  }
+  if (pSel) {
+    pSel.innerHTML = '<option value="">No Project</option>' + state.projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  }
+  if (fpSel) {
+    fpSel.innerHTML = '<option value="">All Projects</option>' + state.projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  }
+
+  // Render Team view cards
+  const teamGrid = document.getElementById('teamGridList');
+  if (teamGrid) {
+    teamGrid.innerHTML = state.members.map(m => `
+      <div style="background:var(--surface2); padding:1.2rem; border-radius:12px; border:1px solid var(--border);">
+        <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:0.8rem;">
+          <div class="avatar-circle">${m.name.split(' ').map(n=>n[0]).join('')}</div>
+          <div>
+            <div style="font-weight:700;">${m.name}</div>
+            <div style="font-size:0.75rem; color:var(--muted);">${m.role}</div>
+          </div>
+        </div>
+        <div style="font-size:0.8rem; color:var(--muted);">
+          Assigned Tasks: <strong>${state.tasks.filter(t => t.assignee === m.id).length}</strong>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+// Comments Modal
+let activeCommentTaskId = null;
+function openComments(taskId) {
+  activeCommentTaskId = taskId;
+  const task = state.tasks.find(t => t.id === taskId);
+  if (!task) return;
+  document.getElementById('commentModalTitle').textContent = 'Comments: ' + task.title;
+  const list = document.getElementById('commentModalList');
+  if (task.comments && task.comments.length > 0) {
+    list.innerHTML = task.comments.map(c => `
+      <div style="background:var(--surface2); padding:0.5rem 0.8rem; border-radius:8px; font-size:0.82rem;">
+        <strong>${c.author}</strong> <span style="font-size:0.7rem; color:var(--dim);">${c.time}</span>
+        <div>${c.text}</div>
+      </div>
+    `).join('');
+  } else {
+    list.innerHTML = '<div style="font-size:0.8rem; color:var(--muted); padding:0.5rem 0;">No comments yet.</div>';
+  }
+  document.getElementById('commentModal').classList.add('open');
+}
+
+function closeCommentModal() {
+  document.getElementById('commentModal').classList.remove('open');
+  activeCommentTaskId = null;
+}
+
+function submitComment() {
+  const input = document.getElementById('commentInput');
+  const text = input.value.trim();
+  if (!text || !activeCommentTaskId) return;
+
+  const task = state.tasks.find(t => t.id === activeCommentTaskId);
+  if (task) {
+    if (!task.comments) task.comments = [];
+    task.comments.push({
+      author: "Alex Rivera",
+      time: "Just now",
+      text
+    });
+    saveState();
+    openComments(activeCommentTaskId);
+    input.value = '';
+    showToast('Comment posted.');
+  }
+}
+
+// Global search
+function handleGlobalSearch(val) {
+  const q = val.toLowerCase();
+  if (!q) {
+    renderTasks();
+    return;
+  }
+  setAppTab('tab-tasks', 'Task Operations');
+  const tbody = document.getElementById('taskTableBody');
+  const rows = tbody.querySelectorAll('tr');
+  rows.forEach(r => {
+    r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+// ══════════════════════════════════════════════
+// DETAILED, EASY-TO-UNDERSTAND CHART RENDERERS
+// ══════════════════════════════════════════════
+function renderAllCharts() {
+  drawTrendChart();
+  drawStatusDonut();
+  drawWorkloadBars();
+  drawPriorityBars();
+}
+
+// 1. Completion Trend Chart with X/Y Grid, Numbers, and Days
+function drawTrendChart() {
+  const canvas = document.getElementById('chartTrend');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                 (!document.documentElement.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
+  const textColor = isDark ? '#94a3b8' : '#64748b';
+  const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const pointBg = isDark ? '#111827' : '#ffffff';
+  
+  canvas.width = canvas.parentElement.offsetWidth - 48;
+  canvas.height = 200;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const data = [14, 18, 16, 28, 24, 36, 42];
+  const max = 50;
+  
+  const padLeft = 32;
+  const padRight = 20;
+  const padTop = 24;
+  const padBottom = 28;
+  
+  const plotW = canvas.width - padLeft - padRight;
+  const plotH = canvas.height - padTop - padBottom;
+
+  // Draw Horizontal Gridlines & Y-Axis Numbers (0, 10, 20, 30, 40, 50)
+  ctx.strokeStyle = gridColor;
+  ctx.lineWidth = 1;
+  ctx.fillStyle = textColor;
+  ctx.font = '10px Inter';
+  ctx.textAlign = 'right';
+
+  [0, 10, 20, 30, 40, 50].forEach(val => {
+    const y = padTop + plotH - (val / max) * plotH;
+    ctx.beginPath();
+    ctx.moveTo(padLeft, y);
+    ctx.lineTo(canvas.width - padRight, y);
+    ctx.stroke();
+    ctx.fillText(val, padLeft - 6, y + 3);
+  });
+
+  const stepX = plotW / (data.length - 1);
+
+  // Draw Line
+  ctx.beginPath();
+  ctx.strokeStyle = '#4f46e5';
+  ctx.lineWidth = 3;
+  ctx.lineJoin = 'round';
+
+  data.forEach((val, i) => {
+    const x = padLeft + i * stepX;
+    const y = padTop + plotH - (val / max) * plotH;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Gradient area
+  ctx.lineTo(padLeft + plotW, padTop + plotH);
+  ctx.lineTo(padLeft, padTop + plotH);
+  const grad = ctx.createLinearGradient(0, padTop, 0, padTop + plotH);
+  grad.addColorStop(0, 'rgba(79, 70, 229, 0.35)');
+  grad.addColorStop(1, 'rgba(79, 70, 229, 0)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Draw Data Points with Numbers and Day Labels
+  data.forEach((val, i) => {
+    const x = padLeft + i * stepX;
+    const y = padTop + plotH - (val / max) * plotH;
+
+    // Glowing Circle
+    ctx.beginPath();
+    ctx.arc(x, y, 4.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#4f46e5';
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = pointBg;
+    ctx.stroke();
+
+    // Value text directly above point
+    ctx.font = 'bold 10px JetBrains Mono';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = isDark ? '#ffffff' : '#0f172a';
+    ctx.fillText(val, x, y - 8);
+
+    // Day of week below X-axis
+    ctx.font = '11px Inter';
+    ctx.fillStyle = textColor;
+    ctx.fillText(days[i], x, canvas.height - 8);
+  });
+}
+
+// 2. Status Distribution Donut with Center Count & Legend
+function drawStatusDonut() {
+  const canvas = document.getElementById('chartStatus');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                 (!document.documentElement.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
+  canvas.width = canvas.parentElement.offsetWidth - 48;
+  canvas.height = 200;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const total = state.tasks.length || 1;
+  const done = state.tasks.filter(t => t.status === 'done').length;
+  const inprog = state.tasks.filter(t => t.status === 'in-progress').length;
+  const todo = state.tasks.filter(t => t.status === 'todo').length;
+
+  const pDone = Math.round((done / total) * 100);
+  const pInprog = Math.round((inprog / total) * 100);
+  const pTodo = 100 - pDone - pInprog;
+
+  // Update HTML legend indicators underneath
+  const legDone = document.getElementById('legDone');
+  const legInprog = document.getElementById('legInprog');
+  const legTodo = document.getElementById('legTodo');
+  if (legDone) legDone.textContent = `${done} tasks (${pDone}%)`;
+  if (legInprog) legInprog.textContent = `${inprog} tasks (${pInprog}%)`;
+  if (legTodo) legTodo.textContent = `${todo} tasks (${pTodo}%)`;
+
+  const slices = [
+    { count: done, color: '#10b981', label: 'Done' },
+    { count: inprog, color: '#4f46e5', label: 'In Progress' },
+    { count: todo, color: '#94a3b8', label: 'To Do' }
+  ];
+
+  let currentAngle = -0.5 * Math.PI;
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  const r = 68;
+  const ringWidth = 22;
+
+  slices.forEach(slice => {
+    if (slice.count === 0) return;
+    const sliceAngle = (slice.count / total) * 2 * Math.PI;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, currentAngle, currentAngle + sliceAngle);
+    ctx.lineWidth = ringWidth;
+    ctx.strokeStyle = slice.color;
+    ctx.stroke();
+    currentAngle += sliceAngle;
+  });
+
+  // Center Details: Total Number & Label
+  ctx.font = 'bold 22px Inter';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = isDark ? '#ffffff' : '#0f172a';
+  ctx.fillText(total, cx, cy + 2);
+
+  ctx.font = '9px Inter';
+  ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+  ctx.fillText('TOTAL TASKS', cx, cy + 18);
+}
+
+// 3. Team Workload Capacity with Exact Counts & Limit Tracks
+function drawWorkloadBars() {
+  const canvas = document.getElementById('chartWorkload');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                 (!document.documentElement.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
+  canvas.width = canvas.parentElement.offsetWidth - 48;
+  canvas.height = 200;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const members = state.members.slice(0, 3);
+  const barH = 20;
+  const gap = 24;
+  const maxCap = 5; // 5 tasks max capacity baseline
+
+  members.forEach((m, idx) => {
+    const y = 30 + idx * (barH + gap);
+    const count = state.tasks.filter(t => t.assignee === m.id).length;
+    const pct = Math.round((count / maxCap) * 100);
+
+    const barStartX = 110;
+    const maxBarW = canvas.width - barStartX - 100;
+    const fillW = Math.max(Math.min((count / maxCap) * maxBarW, maxBarW), 6);
+
+    // Member Name
+    ctx.fillStyle = isDark ? '#ffffff' : '#0f172a';
+    ctx.font = 'bold 12px Inter';
+    ctx.textAlign = 'left';
+    ctx.fillText(m.name, 4, y + 14);
+
+    // Background Empty Track
+    ctx.fillStyle = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(barStartX, y, maxBarW, barH, 5) : ctx.rect(barStartX, y, maxBarW, barH);
+    ctx.fill();
+
+    // Colored Fill Bar
+    const fillColor = pct >= 100 ? '#ef4444' : pct >= 75 ? '#4f46e5' : '#10b981';
+    ctx.fillStyle = fillColor;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(barStartX, y, fillW, barH, 5) : ctx.rect(barStartX, y, fillW, barH);
+    ctx.fill();
+
+    // Inside / Right Detail Text (e.g., "2 / 5 (40%)")
+    ctx.fillStyle = isDark ? '#cbd5e1' : '#475569';
+    ctx.font = '600 11px Inter';
+    ctx.textAlign = 'left';
+    ctx.fillText(`${count}/${maxCap} tasks (${pct}%)`, barStartX + maxBarW + 10, y + 14);
+  });
+}
+
+// 4. Priority Breakdown with Exact Task Counts & Percentages
+function drawPriorityBars() {
+  const canvas = document.getElementById('chartPriority');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                 (!document.documentElement.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
+  canvas.width = canvas.parentElement.offsetWidth - 48;
+  canvas.height = 200;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const total = state.tasks.length || 1;
+  const high = state.tasks.filter(t => t.priority === 'high').length;
+  const med = state.tasks.filter(t => t.priority === 'medium').length;
+  const low = state.tasks.filter(t => t.priority === 'low').length;
+
+  const bars = [
+    { label: 'High', count: high, color: '#ef4444', desc: '<24h SLA' },
+    { label: 'Medium', count: med, color: '#f59e0b', desc: '3-Day SLA' },
+    { label: 'Low', count: low, color: '#10b981', desc: 'Flexible' }
+  ];
+
+  const barW = 54;
+  const gap = 44;
+  const startX = (canvas.width - (3 * barW + 2 * gap)) / 2;
+  const baseY = canvas.height - 40;
+
+  // Baseline
+  ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(startX - 20, baseY);
+  ctx.lineTo(startX + 3 * barW + 2 * gap + 20, baseY);
+  ctx.stroke();
+
+  bars.forEach((b, idx) => {
+    const x = startX + idx * (barW + gap);
+    const pct = Math.round((b.count / total) * 100);
+    const maxBarH = 100;
+    const h = Math.max((b.count / total) * maxBarH, 16);
+    const y = baseY - h;
+
+    // Bar Fill with Top Rounded Corners
+    ctx.fillStyle = b.color;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x, y, barW, h, 6) : ctx.rect(x, y, barW, h);
+    ctx.fill();
+
+    // Exact Count & Percent ABOVE Bar
+    ctx.fillStyle = isDark ? '#ffffff' : '#0f172a';
+    ctx.font = 'bold 12px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${b.count} tasks`, x + barW / 2, y - 16);
+
+    ctx.font = '600 10px Inter';
+    ctx.fillStyle = b.color;
+    ctx.fillText(`${pct}%`, x + barW / 2, y - 4);
+
+    // Label UNDER Bar
+    ctx.fillStyle = isDark ? '#ffffff' : '#0f172a';
+    ctx.font = 'bold 11px Inter';
+    ctx.fillText(b.label, x + barW / 2, baseY + 16);
+
+    ctx.font = '9px Inter';
+    ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+    ctx.fillText(b.desc, x + barW / 2, baseY + 28);
+  });
+}
+
+// Data Export & Reset
+function exportDataJson() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+  const dl = document.createElement('a');
+  dl.setAttribute("href", dataStr);
+  dl.setAttribute("download", "flowpilot_workspace_backup.json");
+  dl.click();
+  showToast('JSON export downloaded.');
+}
+
+function resetData() {
+  if (confirm("Reset all workspace demo data?")) {
+    state = defaultState();
+    saveState();
+    populateDropdowns();
+    renderTasks();
+    renderAllCharts();
+    showToast('Data reset to default.');
+  }
+}
+
+// Initialize on ready
+document.addEventListener('DOMContentLoaded', () => {
+  populateDropdowns();
+  renderTasks();
+});
+</script>
+</body>
+</html>
